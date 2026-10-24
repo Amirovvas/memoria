@@ -1,0 +1,469 @@
+/* ---------- Gift openings on the surprise page; every size follows --w ---------- */
+.env {
+  position: relative;
+  width: var(--w);
+  aspect-ratio: 3 / 2;
+  perspective: 1000px;
+}
+.env-back,
+.env-front,
+.env-flap {
+  position: absolute;
+  border-radius: calc(var(--w) * 0.02);
+}
+.env-back {
+  inset: 0;
+  background: #c9806b;
+  transition: transform 0.8s ease, opacity 0.8s ease;
+}
+.env-card {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 7%;
+  height: 86%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  border-radius: calc(var(--w) * 0.015);
+  background: #fffaf4;
+  box-shadow: 0 10px 30px -10px rgb(80 40 20 / 0.35);
+  transition: transform 1.1s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.env-front {
+  inset: 0;
+  z-index: 3;
+  background: linear-gradient(180deg, #f2c7b3, #e9b29b);
+  clip-path: polygon(0 0, 50% 54%, 100% 0, 100% 100%, 0 100%);
+  transition: transform 0.8s ease, opacity 0.8s ease;
+}
+.env-flap {
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 60%;
+  z-index: 4;
+  background: linear-gradient(180deg, #dd9a83, #e7ab95);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top;
+  transition: transform 0.75s ease-in-out, z-index 0s linear 0.38s, opacity 0.5s ease;
+}
+.env-seal {
+  position: absolute;
+  left: 50%;
+  top: 56%;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 17%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: -50% -50%;
+  background: radial-gradient(circle at 35% 30%, #d0705a, #9f3f2c);
+  box-shadow: 0 3px 8px rgb(90 30 15 / 0.4);
+  color: #ffe9df;
+  font-size: calc(var(--w) * 0.075);
+  transition: opacity 0.3s ease, scale 0.3s ease;
+}
+.env:not([data-phase="closed"]) .env-seal {
+  opacity: 0;
+  scale: 0.6;
+}
+.env:not([data-phase="closed"]) .env-flap {
+  transform: rotateX(180deg);
+  z-index: 1;
+}
+.env[data-phase="out"] .env-card {
+  transform: translateY(-58%);
+}
+.env[data-phase="leave"] .env-card {
+  transform: translateY(-58%) scale(1.12);
+}
+.env[data-phase="leave"] .env-back,
+.env[data-phase="leave"] .env-front {
+  opacity: 0;
+  transform: translateY(40%);
+}
+.env[data-phase="leave"] .env-flap {
+  opacity: 0;
+}
+.env[data-demo] .env-flap {
+  animation: env-demo 3.2s ease-in-out infinite;
+  transition: none;
+}
+.env[data-demo] .env-seal {
+  animation: env-demo-seal 3.2s ease-in-out infinite;
+}
+@keyframes env-demo {
+  0%,
+  20%,
+  100% {
+    transform: rotateX(0);
+    z-index: 4;
+  }
+  45%,
+  75% {
+    transform: rotateX(180deg);
+    z-index: 1;
+  }
+}
+@keyframes env-demo-seal {
+  0%,
+  20%,
+  95%,
+  100% {
+    opacity: 1;
+  }
+  30%,
+  80% {
+    opacity: 0;
+  }
+}
+
+.box {
+  position: relative;
+  width: var(--w);
+  aspect-ratio: 1 / 1.02;
+}
+.box[data-phase="idle"] {
+  animation: box-wiggle 1.4s ease-in-out infinite;
+}
+.box-base {
+  position: absolute;
+  left: 9%;
+  right: 9%;
+  bottom: 0;
+  height: 60%;
+  border-radius: calc(var(--w) * 0.015) calc(var(--w) * 0.015) calc(var(--w) * 0.03) calc(var(--w) * 0.03);
+  background: linear-gradient(90deg, #b9493b, #cf5e4c 45%, #b84a3c);
+  box-shadow: 0 18px 30px -16px rgb(90 30 20 / 0.6);
+}
+.box-lid {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: 28%;
+  z-index: 2;
+  height: 17%;
+  border-radius: calc(var(--w) * 0.02);
+  background: linear-gradient(180deg, #e2705d, #cb5847);
+  box-shadow: 0 6px 12px -6px rgb(90 30 20 / 0.5);
+  transition: transform 1s cubic-bezier(0.3, 1.3, 0.5, 1), opacity 1s ease;
+}
+.box-base::before,
+.box-lid::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 15%;
+  translate: -50%;
+  background: linear-gradient(90deg, #e9b54f, #f6d27e 50%, #e9b54f);
+}
+.box-bow {
+  position: absolute;
+  left: 50%;
+  bottom: 92%;
+  width: 52%;
+  height: 120%;
+  translate: -50%;
+}
+.box-bow::before,
+.box-bow::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 46%;
+  height: 100%;
+  border: calc(var(--w) * 0.035) solid #f0c062;
+  border-radius: 50% 50% 10% 50%;
+}
+.box-bow::before {
+  left: 2%;
+  rotate: -28deg;
+  transform-origin: bottom right;
+}
+.box-bow::after {
+  right: 2%;
+  rotate: 28deg;
+  transform-origin: bottom left;
+  border-radius: 50% 50% 50% 10%;
+}
+.box-glow {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 30%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff3c4 0%, #ffd56b 40%, transparent 70%);
+  opacity: 0;
+  scale: 0.2;
+  transition: scale 1.2s ease, opacity 1.2s ease;
+}
+.box[data-phase="open"] .box-lid {
+  transform: translateY(-190%) rotate(-24deg);
+  opacity: 0;
+}
+.box[data-phase="open"] .box-glow {
+  opacity: 1;
+  scale: 4;
+}
+@keyframes box-wiggle {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0) translateY(0);
+  }
+  68% {
+    transform: rotate(-4deg) translateY(-3%);
+  }
+  76% {
+    transform: rotate(4deg) translateY(-3%);
+  }
+  84% {
+    transform: rotate(-3deg) translateY(-1%);
+  }
+  92% {
+    transform: rotate(2deg);
+  }
+}
+
+.cake {
+  position: relative;
+  width: var(--w);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cake-candles {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: calc(var(--w) * 0.035);
+  height: calc(var(--w) * 0.36);
+  margin-bottom: calc(var(--w) * -0.03);
+}
+.candle {
+  position: relative;
+  width: calc(var(--w) * 0.075);
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.candle-stick {
+  position: relative;
+  width: 55%;
+  height: 58%;
+  border-radius: calc(var(--w) * 0.008);
+  background: repeating-linear-gradient(
+    135deg,
+    #fffaf4 0 calc(var(--w) * 0.018),
+    #f39fb1 calc(var(--w) * 0.018) calc(var(--w) * 0.036)
+  );
+  box-shadow: inset -2px 0 0 rgb(0 0 0 / 0.06);
+}
+.candle-stick::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: 2px;
+  height: calc(var(--w) * 0.03);
+  translate: -50%;
+  background: #4a3a30;
+}
+.flame {
+  position: absolute;
+  left: 50%;
+  bottom: calc(58% + var(--w) * 0.022);
+  width: 80%;
+  aspect-ratio: 1 / 1.7;
+  translate: -50%;
+  border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+  background: radial-gradient(ellipse at 50% 75%, #fffbe0 0 22%, #ffd257 40%, #ff8d3a 68%, transparent 72%);
+  transform-origin: 50% 90%;
+  filter: drop-shadow(0 0 calc(var(--w) * 0.03) rgb(255 180 60 / 0.9));
+  animation: flicker 0.18s ease-in-out infinite alternate;
+  transition: opacity 0.25s ease, scale 0.25s ease;
+}
+/* blown out: the flame bends away from the finger, the smoke drifts the same way */
+.candle[data-out="true"] .flame {
+  opacity: 0;
+  scale: 0.2;
+  rotate: calc(var(--dx, 0) * 40deg);
+  animation: none;
+}
+.smoke {
+  position: absolute;
+  left: 50%;
+  bottom: calc(58% + var(--w) * 0.03);
+  width: 70%;
+  aspect-ratio: 1;
+  translate: -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(150 140 135 / 0.55), transparent 70%);
+  opacity: 0;
+}
+.candle[data-out="true"] .smoke {
+  animation: smoke 1.4s ease-out forwards;
+}
+.cake-tier {
+  position: relative;
+  border-radius: calc(var(--w) * 0.025) calc(var(--w) * 0.025) calc(var(--w) * 0.012) calc(var(--w) * 0.012);
+  background:
+    radial-gradient(circle at 20% 70%, #e2a46e 0 2px, transparent 3px) 0 0 / calc(var(--w) * 0.12) calc(var(--w) * 0.1),
+    linear-gradient(180deg, #f7dcc0, #efc9a5);
+}
+.cake-tier::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 34%;
+  border-radius: inherit;
+  background: var(--frost);
+}
+.cake-tier::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 33%;
+  height: 22%;
+  background: radial-gradient(circle at 50% 0, var(--frost) 0 58%, transparent 61%) 0 0 / calc(var(--w) * 0.075) 100% repeat-x;
+}
+.cake-top {
+  --frost: #f7b8c2;
+  width: 64%;
+  height: calc(var(--w) * 0.2);
+  z-index: 1;
+}
+.cake-bottom {
+  --frost: #fff7ef;
+  width: 86%;
+  height: calc(var(--w) * 0.27);
+}
+.cake-plate {
+  width: 100%;
+  height: calc(var(--w) * 0.045);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f1e9df, #d9cbbb);
+  box-shadow: 0 14px 24px -12px rgb(80 50 30 / 0.5);
+}
+@keyframes flicker {
+  from {
+    transform: rotate(-3deg) scaleY(1);
+  }
+  to {
+    transform: rotate(3deg) scaleY(1.08);
+  }
+}
+@keyframes smoke {
+  0% {
+    opacity: 0.8;
+    transform: translateY(0) scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--dx, 0) * var(--w) * 0.14), calc(var(--w) * -0.3)) scale(2);
+  }
+}
+
+/* ---------- The surprise page ---------- */
+@keyframes drift {
+  0% {
+    transform: translateY(0) rotate(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-110vh) rotate(40deg);
+    opacity: 0;
+  }
+}
+.gift-drift {
+  position: absolute;
+  bottom: -40px;
+  animation: drift linear infinite;
+}
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+.gift-caret {
+  display: inline-block;
+  width: 2px;
+  height: 0.9em;
+  margin-left: 2px;
+  vertical-align: -0.08em;
+  background: currentColor;
+  animation: caret 0.9s steps(1) infinite;
+}
+.polaroid {
+  opacity: 0;
+  transform: translateY(80px) rotate(calc(var(--r) - 8deg)) scale(0.96);
+  transition: opacity 0.9s ease, transform 1.1s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.polaroid[data-in="true"] {
+  opacity: 1;
+  transform: translateY(0) rotate(var(--r)) scale(1);
+}
+@keyframes eq {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+.eq-bar {
+  transform-origin: bottom;
+  animation: eq 0.9s ease-in-out infinite;
+}
+@keyframes gift-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.gift-rise {
+  animation: gift-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes swipe-hint {
+  0%,
+  15% {
+    transform: translateX(-180%) rotate(-12deg);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  75% {
+    transform: translateX(80%) rotate(8deg);
+    opacity: 1;
+  }
+  90%,
+  100% {
+    transform: translateX(80%) rotate(8deg);
+    opacity: 0;
+  }
+}
+.swipe-hint {
+  animation: swipe-hint 2.2s ease-in-out infinite;
+}
