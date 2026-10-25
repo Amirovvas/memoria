@@ -47,15 +47,25 @@ export function CategoryIcon({ icon, ...props }: { icon: IconKey } & LucideProps
   return <Icon {...props} />
 }
 
-export function Logo({ compact }: { compact?: boolean }) {
-  return (
-    <Link href="/" className={s.logo} aria-label="Memoria — на главную">
+/** `href` may point at an anchor on the same page (the landing uses "#top"); then it is a plain link. */
+export function Logo({ compact, href = "/" }: { compact?: boolean; href?: string }) {
+  const content = (
+    <>
       <span className={s.mark}>
         <span className={s.markBack} />
         <span className={s.markFront} />
         <span className={s.markLetter}>M</span>
       </span>
       {!compact ? <span className={s.wordmark}>Memoria</span> : null}
+    </>
+  )
+  return href.startsWith("#") ? (
+    <a href={href} className={s.logo} aria-label="Memoria — наверх">
+      {content}
+    </a>
+  ) : (
+    <Link href={href} className={s.logo} aria-label="Memoria — на главную">
+      {content}
     </Link>
   )
 }
