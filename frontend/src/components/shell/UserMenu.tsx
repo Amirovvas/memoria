@@ -18,7 +18,7 @@ export function Avatar({ user, className = s.avatarSm }: { user: User; className
   )
 }
 
-/** Signing out clears the session; RequireAuth then sends the page to /login. */
+/** Signing out clears the session; RequireAuth then sends the page to the landing or to /login. */
 export function useSignOut() {
   const logout = useLogout()
   const { toast } = useApp()

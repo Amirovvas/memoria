@@ -32,7 +32,8 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!signedOut) return
     const next = pathname + (search ? `?${search}` : "")
-    router.replace(next === "/" ? "/login" : `/login?next=${encodeURIComponent(next)}`)
+    // the home page belongs to the landing for anyone signed out; deeper pages ask to sign in and come back
+    router.replace(next === "/" ? "/welcome" : `/login?next=${encodeURIComponent(next)}`)
   }, [signedOut, pathname, search, router])
 
   if (user) return children
