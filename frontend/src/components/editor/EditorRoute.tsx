@@ -6,15 +6,16 @@ import { useSearchParams } from "next/navigation"
 import { useApp } from "../providers/AppProvider"
 import { EmptyArt, EmptyState } from "../ui/bits"
 import { Editor } from "./Editor"
+import s from "./EditorRoute.module.css"
 
 function EditorSkeleton() {
   return (
-    <div className="flex h-dvh flex-col bg-bg">
-      <div className="h-16 border-b border-line bg-surface" />
-      <div className="flex flex-1">
-        <div className="hidden w-[76px] border-r border-line bg-surface md:block" />
-        <div className="grid flex-1 place-items-center bg-surface-2">
-          <div className="skeleton aspect-[4/5] w-[min(60vw,420px)] rounded-sm" />
+    <div className={s.skeleton}>
+      <div className={s.top} />
+      <div className={s.body}>
+        <div className={s.rail} />
+        <div className={s.stage}>
+          <div className={`skeleton ${s.canvas}`} />
         </div>
       </div>
     </div>
@@ -30,7 +31,7 @@ export function EditorRoute() {
   const project = id ? getProject(id) : undefined
   if (!project || project.deletedAt) {
     return (
-      <div className="grid min-h-dvh place-items-center">
+      <div className={s.missing}>
         <EmptyState
           art={<EmptyArt icon={<FolderSearch size={26} />} />}
           title="Проект не найден"

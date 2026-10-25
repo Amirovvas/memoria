@@ -4,9 +4,11 @@ import { Lock, Mail } from "lucide-react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
-import { useLogin, useUser } from "@/src/hooks/useAuth"
+import { useLogin } from "@/src/hooks/useLogin"
+import { useUser } from "@/src/hooks/useUser"
 import { useApp } from "../providers/AppProvider"
 import { Field, FormError, PasswordField, SubmitButton, safeNext } from "./fields"
+import s from "./form.module.css"
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -49,12 +51,12 @@ export function LoginForm() {
       }}
     >
       <p className="eyebrow">С возвращением</p>
-      <h1 className="display mt-3 text-[44px] sm:text-[52px]">
-        Войти в <em className="text-accent">Memoria</em>
+      <h1 className={`display ${s.title}`}>
+        Войти в <em className={s.accent}>Memoria</em>
       </h1>
-      <p className="mt-3 text-[15px] leading-relaxed text-muted">Ваши коллажи, избранное и черновики ждут вас.</p>
+      <p className={s.lead}>Ваши коллажи, избранное и черновики ждут вас.</p>
 
-      <div className="mt-8 space-y-4">
+      <div className={s.fields}>
         <FormError message={login.error?.message ?? null} />
         <Field
           label="Email"
@@ -84,21 +86,21 @@ export function LoginForm() {
         />
       </div>
 
-      <div className="mt-7">
+      <div className={s.submit}>
         <SubmitButton pending={login.isPending || login.isSuccess} pendingLabel="Входим…">
           Войти
         </SubmitButton>
       </div>
 
-      <div className="my-7 flex items-center gap-3 text-xs font-medium text-faint">
-        <span className="h-px flex-1 bg-line" />
+      <div className={s.divider}>
+        <span className={s.rule} />
         впервые здесь?
-        <span className="h-px flex-1 bg-line" />
+        <span className={s.rule} />
       </div>
 
       <Link
         href={next === "/" ? "/register" : `/register?next=${encodeURIComponent(next)}`}
-        className="btn btn-secondary btn-lg w-full"
+        className={`btn btn-secondary btn-lg ${s.wide}`}
       >
         Создать аккаунт
       </Link>

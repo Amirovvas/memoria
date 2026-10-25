@@ -1,0 +1,37 @@
+.screen {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  background: var(--bg);
+}
+.error {
+  padding: 0 1.5rem;
+  text-align: center;
+}
+.box {
+  max-width: 24rem;
+}
+.icon {
+  margin: 0 auto;
+  display: grid;
+  width: 3.5rem;
+  height: 3.5rem;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.title {
+  margin-top: 1.25rem;
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+}
+.text {
+  margin-top: 0.5rem;
+  font-size: 15px;
+  line-height: 1.625;
+  color: var(--muted);
+}
+.retry {
+  margin-top: 1.5rem;
+}

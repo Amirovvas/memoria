@@ -1,0 +1,73 @@
+.header {
+  padding: 1rem 0 2rem;
+}
+
+.art {
+  position: relative;
+  height: 10rem;
+  width: 14rem;
+}
+.polaroid {
+  position: absolute;
+  height: 7rem;
+  width: 6rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0.5rem 0.5rem 1.5rem;
+  box-shadow: var(--shadow-card);
+}
+.left {
+  left: 1rem;
+  top: 1.5rem;
+  rotate: -12deg;
+}
+.right {
+  right: 1rem;
+  top: 1.5rem;
+  rotate: 12deg;
+}
+.center {
+  left: 50%;
+  top: 0;
+  display: grid;
+  height: 8rem;
+  width: 7rem;
+  translate: -50% 0;
+  place-items: center;
+  padding-bottom: 1.75rem;
+}
+.photo {
+  height: 100%;
+  width: 100%;
+  border-radius: 2px;
+  background: var(--surface-2);
+}
+.photoAlt {
+  background: var(--surface-3);
+}
+.photoHeart {
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+}
+.heart {
+  fill: var(--accent);
+  color: var(--accent);
+}
+.caption {
+  position: absolute;
+  bottom: -0.25rem;
+  left: 50%;
+  translate: -50% 0;
+  rotate: -3deg;
+  font-family: var(--font-hand);
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.picks {
+  margin-top: 2.5rem;
+}

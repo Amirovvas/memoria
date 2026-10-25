@@ -7,6 +7,8 @@ import { CATEGORY_BY_SLUG, templateDoc, type Template } from "@/src/lib/catalog"
 import { STYLES } from "@/src/lib/collage/styles"
 import { CollageCanvas } from "../collage/CollageCanvas"
 import { useApp } from "../providers/AppProvider"
+import { cx } from "@/src/lib/cx"
+import s from "./TemplateCard.module.css"
 
 export function useOpenTemplate() {
   const router = useRouter()
@@ -20,36 +22,30 @@ export function useOpenTemplate() {
   )
 }
 
-/** `overlay` sits on top of a picture; `plain` sits in a row of text next to the title. */
+/** `overlay` sits on top of a picture; `plain` sits in a row of text next to the title. `className` may change the size. */
 export function FavoriteButton({
   id,
   className = "",
-  size = "size-9",
   tone = "overlay",
 }: {
   id: string
   className?: string
-  size?: string
   tone?: "overlay" | "plain"
 }) {
   const { isFavorite, toggleFavorite } = useApp()
   const on = isFavorite(id)
-  const look =
-    tone === "overlay"
-      ? "bg-white/90 text-[#2a241d] shadow-soft backdrop-blur hover:scale-105"
-      : `border transition-colors ${on ? "border-accent/30 bg-accent-soft" : "border-line bg-surface text-muted hover:border-line-strong hover:text-ink"}`
   return (
     <button
       onClick={(e) => {
         e.stopPropagation()
         toggleFavorite(id)
       }}
-      className={`grid ${size} shrink-0 place-items-center rounded-full transition-all active:scale-90 ${look} ${className}`}
+      className={cx(s.favorite, tone === "overlay" ? s.overlay : s.plain, on && s.on, className)}
       aria-label={on ? "Убрать из избранного" : "Добавить в избранное"}
       aria-pressed={on}
       title={on ? "В избранном" : "В избранное"}
     >
-      <Heart size={17} className={on ? "fill-accent text-accent" : ""} />
+      <Heart size={17} className={on ? s.heartOn : ""} />
     </button>
   )
 }
@@ -67,12 +63,12 @@ export function TemplateCard({
 
   // its own size container: phone-width cards get compact badges and a smaller heart
   return (
-    <article className="group animate-fade-up @container/card">
+    <article className={`animate-fade-up ${s.card}`}>
       {/* a div, not a <button>: the collage inside is block content */}
       <div
         role="button"
         tabIndex={0}
-        className="relative cursor-pointer overflow-hidden rounded-2xl bg-surface-2 ring-1 ring-line transition-all duration-300 hover:-translate-y-1 hover:shadow-card"
+        className={s.frame}
         onClick={() => open(t.id)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -84,48 +80,35 @@ export function TemplateCard({
       >
         <CollageCanvas doc={templateDoc(t)} imgWidth={imgWidth} />
 
-        <div className="pointer-events-none absolute left-2 top-2 flex gap-1 @[13rem]/card:left-3 @[13rem]/card:top-3 @[13rem]/card:gap-1.5">
+        <div className={s.badges}>
           {t.editorsPick ? (
-            <span className="flex items-center gap-1 rounded-full bg-ink px-2 py-1 text-[11px] font-semibold text-bg @[13rem]/card:px-2.5" title="Выбор редакции">
+            <span className={`${s.badge} ${s.pick}`} title="Выбор редакции">
               <Sparkles size={11} />
-              <span className="sr-only @[13rem]/card:not-sr-only">Выбор редакции</span>
+              <span className={s.pickLabel}>Выбор редакции</span>
             </span>
           ) : t.isNew ? (
-            <span className="rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-[#2a241d]">Новинка</span>
+            <span className={`${s.badge} ${s.isNew}`}>Новинка</span>
           ) : null}
-          {t.premium ? <span className="rounded-full bg-accent px-2.5 py-1 text-[11px] font-semibold text-accent-ink">Pro</span> : null}
+          {t.premium ? <span className={`${s.badge} ${s.pro}`}>Pro</span> : null}
         </div>
 
-        <span
-          className="pointer-events-none absolute inset-0 hidden items-end justify-center bg-black/0 p-4 opacity-0 transition-all duration-300 group-hover:bg-black/20 group-hover:opacity-100 lg:flex"
-          aria-hidden
-        >
-          <span className="btn btn-sm btn-accent translate-y-2 transition-transform duration-300 group-hover:translate-y-0">
+        <span className={s.hoverLayer} aria-hidden>
+          <span className={`btn btn-sm btn-accent ${s.hoverButton}`}>
             <PenLine size={15} /> Редактировать
           </span>
         </span>
       </div>
 
-      <div className="mt-2.5 flex items-start justify-between gap-2 px-0.5 @[13rem]/card:mt-3 @[13rem]/card:gap-3">
-        <div className="min-w-0">
-          <h3 className="truncate text-[14px] font-semibold @[13rem]/card:text-[15px]">{t.title}</h3>
-          <p className="mt-0.5 truncate text-[12px] text-muted @[13rem]/card:text-[13px]">
+      <div className={s.meta}>
+        <div className={s.minW0}>
+          <h3 className={s.title}>{t.title}</h3>
+          <p className={s.sub}>
             {showCategory ? `${CATEGORY_BY_SLUG[t.category].short} · ` : ""}
             {t.slots} фото · {STYLES[t.style].name}
           </p>
         </div>
-        <FavoriteButton id={t.id} tone="plain" size="size-8 @[13rem]/card:size-9" />
+        <FavoriteButton id={t.id} tone="plain" className={s.cardFavorite} />
       </div>
     </article>
-  )
-}
-
-export function TemplateCardSkeleton({ tall }: { tall?: boolean }) {
-  return (
-    <div>
-      <div className={`skeleton rounded-2xl ${tall ? "aspect-[3/4]" : "aspect-[4/5]"}`} />
-      <div className="skeleton mt-3 h-4 w-2/3 rounded-full" />
-      <div className="skeleton mt-2 h-3 w-1/3 rounded-full" />
-    </div>
   )
 }

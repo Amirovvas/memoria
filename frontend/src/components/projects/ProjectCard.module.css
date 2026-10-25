@@ -1,0 +1,137 @@
+.dialog {
+  max-width: 28rem;
+}
+.form {
+  padding: 1.5rem;
+}
+@media (min-width: 40rem) {
+  .form {
+    padding: 2rem;
+  }
+}
+.dialogTitle {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+.dialogText {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--muted);
+}
+.nameInput {
+  margin-top: 1.5rem;
+  height: 3rem;
+  font-size: 15px;
+}
+.actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.thumb {
+  position: relative;
+  display: flex;
+  aspect-ratio: 4 / 5;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: var(--surface-2);
+  padding: 9%;
+  box-shadow: 0 0 0 1px var(--line);
+  transition: all 0.3s var(--ease);
+}
+.thumb:hover {
+  translate: 0 -0.25rem;
+  box-shadow: 0 0 0 1px var(--line), var(--shadow-card);
+}
+.collage {
+  width: 100%;
+  transition: scale 0.5s var(--ease);
+}
+.card:hover .collage {
+  scale: 1.02;
+}
+.draft {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--surface) 90%, transparent);
+  padding: 0.25rem 0.625rem;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  backdrop-filter: blur(8px);
+}
+.cta {
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  display: none;
+  translate: 0 0.5rem;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s var(--ease);
+}
+.card:hover .cta {
+  translate: 0 0;
+  opacity: 1;
+}
+@media (min-width: 64rem) {
+  .cta {
+    display: flex;
+  }
+}
+.ctaButton {
+  background: #fff;
+  color: #1f1b16;
+  box-shadow: var(--shadow-card);
+}
+.meta {
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0 0.125rem;
+}
+.info {
+  min-width: 0;
+  flex: 1;
+}
+.name,
+.sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.name {
+  font-size: 15px;
+  font-weight: 600;
+}
+.name a:hover {
+  color: var(--accent);
+}
+.sub {
+  margin-top: 0.125rem;
+  font-size: 13px;
+  color: var(--muted);
+}
+.more {
+  margin-right: -0.25rem;
+  width: 2rem;
+  height: 2rem;
+  color: var(--muted);
+}
+.separator {
+  margin: 0.25rem 0;
+  height: 1px;
+  background: var(--line);
+}
+.canvas {
+  box-shadow: var(--shadow-card);
+}

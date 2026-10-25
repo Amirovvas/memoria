@@ -1,0 +1,90 @@
+.root {
+  position: relative;
+}
+.panel {
+  position: absolute;
+  z-index: 50;
+  min-width: 12rem;
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0.375rem;
+  box-shadow: var(--shadow-card);
+}
+.alignLeft {
+  left: 0;
+}
+.alignRight {
+  right: 0;
+}
+.alignCenter {
+  left: 50%;
+  translate: -50% 0;
+}
+.sideTop {
+  bottom: 100%;
+  margin-bottom: 0.5rem;
+}
+.sideBottom {
+  top: 100%;
+  margin-top: 0.5rem;
+}
+
+.item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--ink);
+  transition: color 0.15s var(--ease), background-color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+.item:hover {
+  background: var(--surface-2);
+}
+.danger {
+  color: var(--accent);
+}
+.itemIcon {
+  color: var(--muted);
+}
+.itemIcon > svg {
+  width: 1rem;
+  height: 1rem;
+}
+.itemLabel {
+  flex: 1;
+}
+.check {
+  color: var(--accent);
+}
+
+.swatch {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgb(0 0 0 / 0.1);
+}
+.swatchLg {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+}
+.muted {
+  color: var(--muted);
+}
+.chevron {
+  transition: rotate 0.15s var(--ease);
+}
+.chevronOpen {
+  rotate: 180deg;
+}
+.list {
+  max-height: 18rem;
+  overflow: auto;
+}

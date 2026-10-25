@@ -1,0 +1,19 @@
+.page {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+.title {
+  margin-top: 0.75rem;
+  font-size: 3.75rem;
+  line-height: 1;
+}
+.text {
+  margin-top: 0.75rem;
+  color: var(--muted);
+}
+.action {
+  margin-top: 2rem;
+}

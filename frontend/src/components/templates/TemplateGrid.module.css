@@ -1,0 +1,39 @@
+/* by the content width beside the sidebar (main is the size container); TemplateGrid reads --columns */
+.grid {
+  --columns: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+@media (min-width: 40rem) {
+  .grid {
+    gap: 1.5rem;
+  }
+}
+@container (min-width: 48rem) {
+  .grid {
+    --columns: 3;
+  }
+}
+@container (min-width: 72rem) {
+  .grid {
+    --columns: 4;
+  }
+}
+@container (min-width: 110rem) {
+  .grid {
+    --columns: 5;
+  }
+}
+.column {
+  flex: 1;
+  min-width: 0;
+}
+.item {
+  margin-bottom: 1.5rem;
+}
+@media (min-width: 40rem) {
+  .item {
+    margin-bottom: 2rem;
+  }
+}

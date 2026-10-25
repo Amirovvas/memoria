@@ -8,6 +8,8 @@ export const qrDataUrl = (text: string, width = 640) => QRCode.toDataURL(text, {
 
 /** A large square PNG with a quiet white border, ready to print at any size. */
 export async function downloadQrPng(text: string, filename: string) {
-  const url = await qrDataUrl(text, 1600)
-  downloadBlob(await (await fetch(url)).blob(), filename)
+  const canvas = await QRCode.toCanvas(text, { ...OPTIONS, width: 1600 })
+  const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/png"))
+  if (!blob) throw new Error("qr")
+  downloadBlob(blob, filename)
 }

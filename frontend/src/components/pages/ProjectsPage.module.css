@@ -1,0 +1,28 @@
+.search {
+  position: relative;
+  width: 100%;
+}
+/* own full-bleed row on phones, so the sort chip never covers it */
+.types {
+  margin: 0 -1rem;
+  display: flex;
+  width: calc(100% + 2rem);
+  scroll-padding-inline: 1rem;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0 1rem;
+}
+@media (min-width: 40rem) {
+  .search {
+    width: 18rem;
+  }
+  .types {
+    margin: 0;
+    width: auto;
+    flex: 1;
+    padding: 0;
+  }
+}
+.list {
+  padding-top: 1.5rem;
+}

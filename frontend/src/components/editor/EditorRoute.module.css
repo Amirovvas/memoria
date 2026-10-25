@@ -1,0 +1,42 @@
+.skeleton {
+  display: flex;
+  height: 100dvh;
+  flex-direction: column;
+  background: var(--bg);
+}
+.top {
+  height: 4rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.body {
+  display: flex;
+  flex: 1;
+}
+.rail {
+  display: none;
+  width: 76px;
+  border-right: 1px solid var(--line);
+  background: var(--surface);
+}
+@media (min-width: 48rem) {
+  .rail {
+    display: block;
+  }
+}
+.stage {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  background: var(--surface-2);
+}
+.canvas {
+  aspect-ratio: 4 / 5;
+  width: min(60vw, 420px);
+  border-radius: 0.25rem;
+}
+.missing {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+}

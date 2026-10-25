@@ -1,0 +1,138 @@
+.thumb {
+  position: relative;
+  display: flex;
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: linear-gradient(160deg, #fbefe6, #f3dccf);
+  padding: 12%;
+  box-shadow: 0 0 0 1px var(--line);
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+}
+.thumb:hover {
+  translate: 0 -0.25rem;
+  box-shadow: 0 0 0 1px var(--line), var(--shadow-card);
+}
+.cover {
+  display: block;
+  width: 100%;
+  rotate: -3deg;
+  background: #fffdf8;
+  padding: 5% 5% 14%;
+  box-shadow: var(--shadow-card);
+  transition: rotate 0.5s var(--ease);
+}
+.thumb:hover .cover {
+  rotate: 0deg;
+}
+.coverImage {
+  display: block;
+  width: 100%;
+}
+.giftIcon {
+  color: var(--accent);
+}
+.occasion {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.9);
+  padding: 0.25rem 0.625rem;
+  font-size: 11px;
+  font-weight: 600;
+  color: #5b3a2e;
+  backdrop-filter: blur(8px);
+}
+.qr {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: 999px;
+  background: #fff;
+  color: #1f1b16;
+  box-shadow: var(--shadow-card);
+}
+.meta {
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0 0.125rem;
+}
+.info {
+  min-width: 0;
+  flex: 1;
+}
+.name,
+.sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.name {
+  font-size: 15px;
+  font-weight: 600;
+}
+.sub {
+  margin-top: 0.125rem;
+  font-size: 13px;
+  color: var(--muted);
+}
+.action {
+  width: 2rem;
+  height: 2rem;
+  color: var(--muted);
+}
+.last {
+  margin-right: -0.25rem;
+}
+.skeleton {
+  aspect-ratio: 4 / 5;
+  border-radius: 1rem;
+}
+
+.dialog {
+  max-width: 28rem;
+}
+.dialogBody {
+  padding: 1.5rem;
+}
+@media (min-width: 40rem) {
+  .dialogBody {
+    padding: 2rem;
+  }
+}
+.eyebrowAccent {
+  color: var(--accent);
+}
+.dialogTitle {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+.shareTitle {
+  margin: 0.25rem 0 1.5rem;
+}
+.dialogText {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--muted);
+}
+.actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.danger {
+  background: #b4553a;
+}

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react"
 import { confettiFrom } from "@/src/lib/confetti"
 import type { Opening as OpeningKind } from "@/src/lib/gifts"
+import s from "./gift.module.css"
 
 const size = (w: string) => ({ "--w": w }) as CSSProperties
 
@@ -27,22 +28,22 @@ function useTimeline(steps: [number, () => void][], enabled = true) {
 
 function EnvelopeArt({ phase, name, demo }: { phase: string; name?: string; demo?: boolean }) {
   return (
-    <div className="env" data-phase={phase} data-demo={demo || undefined}>
-      <div className="env-back" />
-      <div className="env-card">
+    <div className={s.env} data-phase={phase} data-demo={demo || undefined}>
+      <div className={s.envBack} />
+      <div className={s.envCard}>
         {name ? (
-          <div className="px-3 text-center text-[#5b3a2e]">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#b07b66]">для тебя</p>
-            <p className="mt-1 font-script text-[clamp(28px,8vw,42px)] leading-none">{name}</p>
-            <p className="mt-1 text-xl text-[#d0705a]">♥</p>
+          <div className={s.cardText}>
+            <p className={s.forYou}>для тебя</p>
+            <p className={s.envName}>{name}</p>
+            <p className={`${s.heart} ${s.heartLarge}`}>♥</p>
           </div>
         ) : (
-          <span className="text-[#d0705a]">♥</span>
+          <span className={s.heart}>♥</span>
         )}
       </div>
-      <div className="env-front" />
-      <div className="env-flap" />
-      <div className="env-seal">♥</div>
+      <div className={s.envFront} />
+      <div className={s.envFlap} />
+      <div className={s.envSeal}>♥</div>
     </div>
   )
 }
@@ -56,7 +57,7 @@ function Envelope({ name, onDone }: { name: string; onDone: () => void }) {
     [900, onDone],
   ])
   return (
-    <div className="pt-[18vh]">
+    <div className={s.envelopeScene}>
       <EnvelopeArt phase={phase} name={name} />
     </div>
   )
@@ -66,11 +67,11 @@ function Envelope({ name, onDone }: { name: string; onDone: () => void }) {
 
 function BoxArt({ phase }: { phase: "idle" | "open" }) {
   return (
-    <div className="box" data-phase={phase}>
-      <div className="box-glow" />
-      <div className="box-base" />
-      <div className="box-lid">
-        <div className="box-bow" />
+    <div className={s.box} data-phase={phase}>
+      <div className={s.boxGlow} />
+      <div className={s.boxBase} />
+      <div className={s.boxLid}>
+        <div className={s.boxBow} />
       </div>
     </div>
   )
@@ -87,11 +88,11 @@ function GiftBox({ onDone }: { onDone: () => void }) {
   useTimeline([[2600, open]], phase === "idle")
   useTimeline([[2300, onDone]], phase === "open")
   return (
-    <div className="flex flex-col items-center">
-      <button ref={ref} onClick={open} aria-label="Открыть коробку" className="cursor-pointer" style={size("min(250px, 62vw)")}>
+    <div className={s.column}>
+      <button ref={ref} onClick={open} aria-label="Открыть коробку" className={s.boxButton} style={size("min(250px, 62vw)")}>
         <BoxArt phase={phase} />
       </button>
-      <p className={`mt-10 font-hand text-2xl text-[#7a5446] transition-opacity duration-500 ${phase === "open" ? "opacity-0" : ""}`}>Нажми на коробку</p>
+      <p className={`${s.prompt} ${s.boxPrompt} ${phase === "open" ? s.hidden : ""}`}>Нажми на коробку</p>
     </div>
   )
 }
@@ -105,19 +106,19 @@ type Candles = (number | null)[]
 
 function CakeArt({ out }: { out: Candles }) {
   return (
-    <div className="cake">
-      <div className="cake-candles">
+    <div className={s.cake}>
+      <div className={s.cakeCandles}>
         {out.map((o, i) => (
-          <span key={i} className="candle" data-candle={i} data-out={o !== null} style={{ "--dx": o ?? 0 } as CSSProperties}>
-            <span className="flame" />
-            <span className="smoke" />
-            <span className="candle-stick" />
+          <span key={i} className={s.candle} data-candle={i} data-out={o !== null} style={{ "--dx": o ?? 0 } as CSSProperties}>
+            <span className={s.flame} />
+            <span className={s.smoke} />
+            <span className={s.candleStick} />
           </span>
         ))}
       </div>
-      <div className="cake-tier cake-top" />
-      <div className="cake-tier cake-bottom" />
-      <div className="cake-plate" />
+      <div className={`${s.cakeTier} ${s.cakeTop}`} />
+      <div className={`${s.cakeTier} ${s.cakeBottom}`} />
+      <div className={s.cakePlate} />
     </div>
   )
 }
@@ -178,24 +179,24 @@ function Cake({ onDone }: { onDone: () => void }) {
   useTimeline([[2600, onDone]], done)
 
   return (
-    <div className="flex flex-col items-center px-6 text-center">
-      <p className={`mb-8 font-hand text-[28px] leading-tight text-[#7a5446] transition-opacity duration-500 ${done ? "opacity-0" : ""}`}>
+    <div className={`${s.column} ${s.cakeScene}`}>
+      <p className={`${s.prompt} ${s.wish} ${done ? s.hidden : ""}`}>
         Загадай желание
         <br />и задуй свечи
       </p>
-      <div ref={ref} className="touch-none select-none px-6 pt-4" style={size("min(280px, 70vw)")} {...swipe}>
+      <div ref={ref} className={s.cakeTouch} style={size("min(280px, 70vw)")} {...swipe}>
         <CakeArt out={out} />
       </div>
-      <div className="mt-10 min-h-[88px]">
+      <div className={s.cakeFooter}>
         {done ? (
-          <p className="gift-rise font-script text-4xl text-[#b4553a]">Ура! 🎉</p>
+          <p className={`${s.giftRise} ${s.hooray}`}>Ура! 🎉</p>
         ) : (
           <>
-            <p className="relative mx-auto h-8 w-28 overflow-hidden" aria-hidden>
-              <span className="swipe-hint absolute left-1/2 top-0 text-2xl">👆</span>
+            <p className={s.hintTrack} aria-hidden>
+              <span className={`${s.swipeHint} ${s.hintHand}`}>👆</span>
             </p>
-            <p className="mt-1 text-[15px] font-semibold text-[#7a5446]">Проведи пальцем по свечам</p>
-            <p className="mt-1 text-[13px] text-[#9b7a6c]">{left === CANDLES ? "или нажми на каждую" : `осталось: ${left}`}</p>
+            <p className={s.swipeText}>Проведи пальцем по свечам</p>
+            <p className={s.swipeLeft}>{left === CANDLES ? "или нажми на каждую" : `осталось: ${left}`}</p>
           </>
         )}
       </div>
@@ -219,9 +220,9 @@ export function OpeningScene({ kind, name, onDone }: { kind: OpeningKind; name: 
 /** Small looping illustration for the choice in the wizard. */
 export function OpeningPreview({ kind }: { kind: OpeningKind }) {
   return (
-    <span className="flex h-full items-end justify-center pb-4">
+    <span className={s.preview}>
       {kind === "envelope" ? (
-        <span className="mb-3" style={size("120px")}>
+        <span className={s.previewEnvelope} style={size("120px")}>
           <EnvelopeArt phase="closed" demo />
         </span>
       ) : kind === "box" ? (

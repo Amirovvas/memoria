@@ -3,8 +3,8 @@
 import { ArrowLeft, ArrowRight, Check, Gift as GiftIcon, GripVertical, Loader2, Music, Pause, Play, Sparkles, Upload, VolumeX, X } from "lucide-react"
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react"
 import { createPortal } from "react-dom"
-import { useUser } from "@/src/hooks/useAuth"
-import { useCreateGift } from "@/src/hooks/useGifts"
+import { useUser } from "@/src/hooks/useUser"
+import { useCreateGift } from "@/src/hooks/useCreateGift"
 import { snapshotCollage } from "@/src/lib/export/snapshot"
 import {
   MUSIC_MOODS,
@@ -24,7 +24,9 @@ import { CollageCanvas } from "../collage/CollageCanvas"
 import { useApp, type Project } from "../providers/AppProvider"
 import { Modal } from "../ui/Modal"
 import { GiftShare } from "./GiftShare"
+import { cx } from "@/src/lib/cx"
 import { OpeningPreview } from "./openings"
+import s from "./GiftWizard.module.css"
 
 const STEPS = ["Коллажи", "Поздравление", "Сюрприз и музыка", "Готово"]
 const MAX_COLLAGES = 20
@@ -35,21 +37,17 @@ type MusicChoice = { track: string } | { file: File } | null
 
 function Progress({ step }: { step: number }) {
   return (
-    <ol className="flex items-center gap-2" aria-label="Шаги">
+    <ol className={s.progress} aria-label="Шаги">
       {STEPS.map((label, i) => {
         const done = i < step
         const current = i === step
         return (
-          <li key={label} className={`flex items-center gap-2 ${current ? "min-w-0 flex-1 sm:flex-none" : ""}`} aria-current={current ? "step" : undefined}>
-            <span
-              className={`grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold transition-colors ${
-                done ? "bg-sage text-white" : current ? "bg-ink text-bg" : "bg-surface-2 text-faint"
-              }`}
-            >
+          <li key={label} className={cx(s.step, current && s.stepCurrent)} aria-current={current ? "step" : undefined}>
+            <span className={cx(s.number, done && s.numberDone, current && s.numberCurrent)}>
               {done ? <Check size={14} strokeWidth={3} /> : i + 1}
             </span>
-            <span className={`truncate text-[13px] font-semibold ${current ? "text-ink" : "hidden text-faint md:inline"}`}>{label}</span>
-            {i < STEPS.length - 1 ? <span className={`h-px w-4 shrink-0 md:w-8 ${done ? "bg-sage" : "bg-line-strong"}`} /> : null}
+            <span className={cx(s.stepLabel, current && s.stepLabelCurrent)}>{label}</span>
+            {i < STEPS.length - 1 ? <span className={cx(s.connector, done && s.connectorDone)} /> : null}
           </li>
         )
       })}
@@ -94,17 +92,17 @@ function CollagesStep({ projects, selected, setSelected }: { projects: Project[]
     setSelected(selected.includes(id) ? selected.filter((x) => x !== id) : selected.length < MAX_COLLAGES ? [...selected, id] : selected)
 
   if (!projects.length) {
-    return <p className="py-16 text-center text-muted">В «Моих проектах» пока нет коллажей. Создайте коллаж — и из него можно будет сделать подарок.</p>
+    return <p className={s.empty}>В «Моих проектах» пока нет коллажей. Создайте коллаж — и из него можно будет сделать подарок.</p>
   }
 
   return (
     <div>
-      <h3 className="display text-3xl">Какие коллажи подарить?</h3>
-      <p className="mt-1 text-sm text-muted">Они появятся на странице-сюрпризе в этом порядке. Перетащите, чтобы поменять местами.</p>
+      <h3 className={`display ${s.title}`}>Какие коллажи подарить?</h3>
+      <p className={s.sub}>Они появятся на странице-сюрпризе в этом порядке. Перетащите, чтобы поменять местами.</p>
 
-      <div className="mt-4 min-h-[92px] rounded-2xl border border-dashed border-line-strong bg-surface-2/50 p-2.5">
+      <div className={s.tray}>
         {selected.length ? (
-          <ul className="flex flex-wrap gap-2.5">
+          <ul className={s.trayList}>
             {selected.map((id, i) => {
               const p = byId.get(id)
               if (!p) return null
@@ -113,26 +111,24 @@ function CollagesStep({ projects, selected, setSelected }: { projects: Project[]
                   key={id}
                   data-sort-id={id}
                   onPointerDown={(e) => start(e, id)}
-                  className={`relative w-[70px] cursor-grab touch-none select-none rounded-lg bg-surface p-1.5 shadow-soft ring-1 ring-line transition-transform active:cursor-grabbing ${
-                    dragging === id ? "z-10 scale-105 shadow-card ring-accent" : ""
-                  }`}
+                  className={cx(s.chosen, dragging === id && s.dragging)}
                   title={p.name}
                 >
-                  <div className="pointer-events-none">
+                  <div className={s.noPointer}>
                     <CollageCanvas doc={p.doc} imgWidth={140} />
                   </div>
-                  <span className="absolute -left-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-ink text-[10px] font-bold text-bg">{i + 1}</span>
-                  <GripVertical size={12} className="absolute bottom-0.5 right-0.5 text-faint" />
+                  <span className={s.order}>{i + 1}</span>
+                  <GripVertical size={12} className={s.grip} />
                 </li>
               )
             })}
           </ul>
         ) : (
-          <p className="grid h-[72px] place-items-center text-sm text-faint">Выберите коллажи ниже</p>
+          <p className={s.trayEmpty}>Выберите коллажи ниже</p>
         )}
       </div>
 
-      <div className="mt-5 grid grid-cols-3 gap-3 sm:grid-cols-4">
+      <div className={s.choices}>
         {projects.map((p) => {
           const n = selected.indexOf(p.id)
           const on = n >= 0
@@ -141,19 +137,15 @@ function CollagesStep({ projects, selected, setSelected }: { projects: Project[]
               key={p.id}
               onClick={() => toggle(p.id)}
               aria-pressed={on}
-              className={`group relative flex flex-col rounded-2xl p-2 text-left transition ${on ? "bg-accent-soft ring-2 ring-accent" : "bg-surface-2 ring-1 ring-line hover:ring-line-strong"}`}
+              className={s.choice}
             >
-              <span className="flex aspect-square items-center justify-center p-[6%]">
-                <span className="w-full">
-                  <CollageCanvas doc={p.doc} imgWidth={240} className="shadow-soft" />
+              <span className={s.choiceThumb}>
+                <span className={s.full}>
+                  <CollageCanvas doc={p.doc} imgWidth={240} className={s.canvas} />
                 </span>
               </span>
-              <span className="mt-1.5 truncate px-0.5 text-xs font-semibold">{p.name}</span>
-              <span
-                className={`absolute right-2.5 top-2.5 grid size-6 place-items-center rounded-full text-[11px] font-bold transition ${
-                  on ? "bg-accent text-accent-ink" : "border-2 border-white/90 bg-black/10 text-transparent"
-                }`}
-              >
+              <span className={cx(s.truncate, s.choiceName)}>{p.name}</span>
+              <span className={cx(s.mark, on && s.markOn)}>
                 {on ? n + 1 : ""}
               </span>
             </button>
@@ -183,20 +175,20 @@ function WordsStep({ words, setWords }: { words: Words; setWords: (patch: Partia
   }
 
   return (
-    <div className="space-y-5">
+    <div className={s.words}>
       <div>
-        <h3 className="display text-3xl">Поздравление</h3>
-        <p className="mt-1 text-sm text-muted">Текст будет появляться по буквам, как на печатной машинке.</p>
+        <h3 className={`display ${s.title}`}>Поздравление</h3>
+        <p className={s.sub}>Текст будет появляться по буквам, как на печатной машинке.</p>
       </div>
 
-      <label className="block">
-        <span className="mb-1.5 block text-sm font-semibold">Кому</span>
-        <input className="input h-12 text-[15px]" value={words.recipient} maxLength={60} placeholder="Например, Аня" onChange={(e) => setWords({ recipient: e.target.value })} />
+      <label className={s.field}>
+        <span className={s.label}>Кому</span>
+        <input className={`input ${s.inputLarge}`} value={words.recipient} maxLength={60} placeholder="Например, Аня" onChange={(e) => setWords({ recipient: e.target.value })} />
       </label>
 
       <div>
-        <span className="mb-1.5 block text-sm font-semibold">Повод</span>
-        <div className="flex flex-wrap gap-2">
+        <span className={s.label}>Повод</span>
+        <div className={s.chips}>
           {OCCASIONS.map((o) => (
             <button
               key={o.id}
@@ -216,18 +208,18 @@ function WordsStep({ words, setWords }: { words: Words; setWords: (patch: Partia
       </div>
 
       <div>
-        <div className="mb-1.5 flex items-center justify-between gap-2">
-          <span className="text-sm font-semibold">Текст поздравления</span>
-          <button className="btn btn-sm btn-ghost -mr-2 text-accent" onClick={() => suggest(ideas ? seed + 1 : seed)}>
+        <div className={s.messageHead}>
+          <span className={s.labelText}>Текст поздравления</span>
+          <button className={`btn btn-sm btn-ghost ${s.suggest}`} onClick={() => suggest(ideas ? seed + 1 : seed)}>
             <Sparkles size={15} /> {ideas ? "Ещё варианты" : "Предложить текст"}
           </button>
         </div>
         {ideas ? (
-          <div className="mb-3 grid gap-2">
+          <div className={s.ideas}>
             {ideas.map((t) => (
               <button
                 key={t}
-                className="animate-fade-up rounded-2xl border border-line bg-surface-2/60 px-4 py-3 text-left font-serif text-[17px] leading-snug transition hover:border-accent hover:bg-accent-soft"
+                className={`animate-fade-up ${s.idea}`}
                 onClick={() => {
                   setWords({ message: t })
                   setIdeas(null)
@@ -239,23 +231,23 @@ function WordsStep({ words, setWords }: { words: Words; setWords: (patch: Partia
           </div>
         ) : null}
         <textarea
-          className="input h-auto min-h-[140px] resize-y rounded-2xl py-3 font-serif text-[18px] leading-snug"
+          className={`input ${s.message}`}
           value={words.message}
           maxLength={2000}
           placeholder="Напишите пару тёплых слов…"
           onChange={(e) => setWords({ message: e.target.value })}
         />
-        <p className="mt-1 text-right text-[11px] text-faint">{words.message.length} / 2000</p>
+        <p className={s.counter}>{words.message.length} / 2000</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <label className="block">
-          <span className="mb-1.5 block text-sm font-semibold">Подпись</span>
-          <input className="input h-12 font-script text-[19px]" value={words.signature} maxLength={60} placeholder="Твоя Маша" onChange={(e) => setWords({ signature: e.target.value })} />
+      <div className={s.pair}>
+        <label className={s.field}>
+          <span className={s.label}>Подпись</span>
+          <input className={`input ${s.signature}`} value={words.signature} maxLength={60} placeholder="Твоя Маша" onChange={(e) => setWords({ signature: e.target.value })} />
         </label>
-        <label className="block">
-          <span className="mb-1.5 block text-sm font-semibold">Надпись в конце</span>
-          <input className="input h-12 text-[15px]" value={words.finale} maxLength={80} onChange={(e) => setWords({ finale: e.target.value })} />
+        <label className={s.field}>
+          <span className={s.label}>Надпись в конце</span>
+          <input className={`input ${s.inputLarge}`} value={words.finale} maxLength={80} onChange={(e) => setWords({ finale: e.target.value })} />
         </label>
       </div>
     </div>
@@ -322,30 +314,29 @@ function SurpriseStep({
     setMusic({ file: ok })
   }
 
-  const row = (active: boolean) =>
-    `flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition ${active ? "border-ink bg-surface-2" : "border-line hover:border-line-strong"}`
+  const row = (active: boolean) => cx(s.row, active && s.rowActive)
 
   return (
-    <div className="space-y-7">
+    <div className={s.surprise}>
       <div>
-        <h3 className="display text-3xl">Как открыть сюрприз?</h3>
-        <p className="mt-1 text-sm text-muted">Эту анимацию друг увидит сразу после кнопки «Открыть».</p>
-        <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+        <h3 className={`display ${s.title}`}>Как открыть сюрприз?</h3>
+        <p className={s.sub}>Эту анимацию друг увидит сразу после кнопки «Открыть».</p>
+        <div className={s.openings}>
           {OPENINGS.map((o) => (
             <button
               key={o.id}
               onClick={() => setOpening(o.id)}
               aria-pressed={opening === o.id}
-              className={`flex flex-col overflow-hidden rounded-2xl border text-left transition ${opening === o.id ? "border-ink ring-1 ring-ink" : "border-line hover:border-line-strong"}`}
+              className={s.opening}
             >
-              <span className="block h-[96px] overflow-hidden bg-[linear-gradient(160deg,#fbefe6,#f3dccf)] sm:h-[132px]">
-                <span className="block h-full origin-bottom max-sm:scale-[0.72]">
+              <span className={s.openingArt}>
+                <span className={s.openingScale}>
                   <OpeningPreview kind={o.id} />
                 </span>
               </span>
-              <span className="block p-2.5 sm:p-3">
-                <span className="block text-[13px] font-bold leading-tight sm:text-sm">{o.label}</span>
-                <span className="mt-0.5 hidden text-xs text-muted sm:block">{o.text}</span>
+              <span className={s.openingText}>
+                <span className={s.openingLabel}>{o.label}</span>
+                <span className={s.openingHint}>{o.text}</span>
               </span>
             </button>
           ))}
@@ -353,36 +344,36 @@ function SurpriseStep({
       </div>
 
       <div>
-        <h3 className="display text-3xl">Музыка</h3>
-        <p className="mt-1 text-sm text-muted">Включится, когда друг нажмёт «Открыть», и будет играть по кругу.</p>
-        <div className="mt-4 flex gap-1.5 overflow-x-auto pb-1 scrollbar-thin" role="tablist" aria-label="Настроение">
+        <h3 className={`display ${s.title}`}>Музыка</h3>
+        <p className={s.sub}>Включится, когда друг нажмёт «Открыть», и будет играть по кругу.</p>
+        <div className={`scrollbar-thin ${s.moods}`} role="tablist" aria-label="Настроение">
           {MUSIC_MOODS.map((m) => (
             <button
               key={m.id}
               role="tab"
               aria-selected={mood === m.id}
               onClick={() => setMood(m.id)}
-              className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition ${mood === m.id ? "border-ink bg-ink text-bg" : "border-line text-muted hover:border-line-strong hover:text-ink"}`}
+              className={s.mood}
             >
               {m.label}
             </button>
           ))}
         </div>
-        <div className="mt-3 space-y-2">
+        <div className={s.tracks}>
           {TRACKS.filter((t) => t.mood === mood).map((t) => {
             const active = !!music && "track" in music && music.track === t.id
             return (
               <div key={t.id} className={row(active)}>
-                <button className="icon-btn size-10 bg-surface-2" onClick={() => listen(t.id, t.url)} aria-label={playing === t.id ? "Пауза" : "Послушать"}>
+                <button className={`icon-btn ${s.play}`} onClick={() => listen(t.id, t.url)} aria-label={playing === t.id ? "Пауза" : "Послушать"}>
                   {playing === t.id ? <Pause size={16} /> : <Play size={16} />}
                 </button>
-                <button className="min-w-0 flex-1 text-left" onClick={() => setMusic({ track: t.id })}>
-                  <span className="block truncate text-sm font-semibold">
-                    {t.title} <span className="font-normal text-muted">— {t.artist}</span>
+                <button className={s.trackInfo} onClick={() => setMusic({ track: t.id })}>
+                  <span className={cx(s.truncate, s.trackTitle)}>
+                    {t.title} <span className={s.artist}>— {t.artist}</span>
                   </span>
-                  <span className="block text-xs text-muted">
+                  <span className={s.trackHint}>
                     {t.hint}
-                    {t.id === suggested ? <span className="text-accent"> · подходит к поводу</span> : null}
+                    {t.id === suggested ? <span className={s.accent}> · подходит к поводу</span> : null}
                   </span>
                 </button>
                 <Radio on={active} onClick={() => setMusic({ track: t.id })} />
@@ -391,40 +382,40 @@ function SurpriseStep({
           })}
 
           {picked && picked.mood !== mood ? (
-            <p className="px-1 pt-1 text-xs text-muted">
+            <p className={s.pickedNote}>
               Выбран трек «{picked.title}» из раздела «{MUSIC_MOODS.find((m) => m.id === picked.mood)?.label}»
             </p>
           ) : null}
 
           <div className={row(!!own)}>
             {ownSrc ? (
-              <button className="icon-btn size-10 bg-surface-2" onClick={() => listen("own", ownSrc)} aria-label={playing === "own" ? "Пауза" : "Послушать"}>
+              <button className={`icon-btn ${s.play}`} onClick={() => listen("own", ownSrc)} aria-label={playing === "own" ? "Пауза" : "Послушать"}>
                 {playing === "own" ? <Pause size={16} /> : <Play size={16} />}
               </button>
             ) : (
-              <span className="grid size-10 place-items-center rounded-full bg-surface-2 text-muted">
+              <span className={s.iconPlaceholder}>
                 <Music size={16} />
               </span>
             )}
-            <label className="min-w-0 flex-1 cursor-pointer">
-              <span className="block truncate text-sm font-semibold">{own ? own.name : "Своя музыка"}</span>
-              <span className="block text-xs text-muted">{own ? `${(own.size / 1024 / 1024).toFixed(1)} МБ · загрузится вместе с подарком` : "MP3, M4A, OGG или WAV до 15 МБ"}</span>
-              <input type="file" accept="audio/*,.mp3,.m4a,.aac,.ogg,.wav" className="sr-only" onChange={(e) => pick(e.target.files?.[0])} />
+            <label className={cx(s.trackInfo, s.ownTrack)}>
+              <span className={cx(s.truncate, s.trackTitle)}>{own ? own.name : "Своя музыка"}</span>
+              <span className={s.trackHint}>{own ? `${(own.size / 1024 / 1024).toFixed(1)} МБ · загрузится вместе с подарком` : "MP3, M4A, OGG или WAV до 15 МБ"}</span>
+              <input type="file" accept="audio/*,.mp3,.m4a,.aac,.ogg,.wav" className={s.srOnly} onChange={(e) => pick(e.target.files?.[0])} />
             </label>
             {own ? (
               <Radio on onClick={() => setMusic({ file: own })} />
             ) : (
-              <span className="btn btn-sm btn-secondary pointer-events-none">
+              <span className={`btn btn-sm btn-secondary ${s.uploadTag}`}>
                 <Upload size={14} /> Загрузить
               </span>
             )}
           </div>
 
           <button className={row(music === null)} onClick={() => setMusic(null)}>
-            <span className="grid size-10 place-items-center rounded-full bg-surface-2 text-muted">
+            <span className={s.iconPlaceholder}>
               <VolumeX size={16} />
             </span>
-            <span className="flex-1 text-sm font-semibold">Без музыки</span>
+            <span className={s.noMusic}>Без музыки</span>
             <Radio on={music === null} />
           </button>
         </div>
@@ -437,47 +428,29 @@ function Radio({ on, onClick }: { on: boolean; onClick?: () => void }) {
   return (
     <span
       onClick={onClick}
-      className={`grid size-5 shrink-0 cursor-pointer place-items-center rounded-full border-2 ${on ? "border-accent" : "border-line-strong"}`}
+      className={cx(s.radio, on && s.radioOn)}
       aria-hidden
     >
-      {on ? <span className="size-2 rounded-full bg-accent" /> : null}
+      {on ? <span className={s.radioDot} /> : null}
     </span>
   )
 }
 
 /* ---------- step 4: done ---------- */
 
-/** The real surprise page in a phone frame, scaled down from a 390 px wide screen. */
-function PhonePreview({ id }: { id: string }) {
-  return (
-    <div className="relative mx-auto w-[234px] shrink-0 rounded-[40px] bg-[#1b1714] p-[9px] shadow-float">
-      <div className="relative h-[488px] overflow-hidden rounded-[32px] bg-white">
-        <iframe title="Предпросмотр подарка" src={`/g/${id}`} className="absolute left-0 top-0 h-[813px] w-[390px] origin-top-left scale-[0.6] border-0" allow="autoplay" />
-      </div>
-      <span className="absolute left-1/2 top-[15px] h-[18px] w-[68px] -translate-x-1/2 rounded-full bg-[#1b1714]" />
-    </div>
-  )
-}
-
 function DoneStep({ gift }: { gift: Gift }) {
   return (
-    <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[auto_minmax(0,1fr)]">
-      <div className="order-2 md:order-1">
-        <PhonePreview id={gift.id} />
-        <p className="mt-3 text-center text-xs text-muted">Так подарок выглядит на телефоне</p>
+    <div className={s.done}>
+      <div className={s.doneHead}>
+        <span className={s.doneIcon}>
+          <Check size={24} />
+        </span>
+        <h3 className={`display ${s.doneTitle}`}>Подарок готов!</h3>
+        <p className={s.sub}>
+          Распечатайте QR-код и положите его на торт, в открытку или в коробку.
+        </p>
       </div>
-      <div className="order-1 md:order-2">
-        <div className="mb-6 text-center">
-          <span className="mx-auto grid size-12 place-items-center rounded-full bg-sage-soft text-sage">
-            <Check size={24} />
-          </span>
-          <h3 className="display mt-3 text-4xl">Подарок готов!</h3>
-          <p className="mt-1 text-sm text-muted">
-            Распечатайте QR-код и положите его на торт, в открытку или в коробку. {gift.recipient} отсканирует его телефоном.
-          </p>
-        </div>
-        <GiftShare id={gift.id} recipient={gift.recipient} />
-      </div>
+      <GiftShare id={gift.id} recipient={gift.recipient} />
     </div>
   )
 }
@@ -496,9 +469,9 @@ function SnapshotStage({ projects, onReady }: { projects: Project[]; onReady: (n
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return createPortal(
-    <div className="pointer-events-none fixed left-0 top-0 -z-10 opacity-0" aria-hidden>
+    <div className={s.snapshots} aria-hidden>
       {projects.map((p) => (
-        <div key={p.id} className="absolute left-0 top-0 w-[800px]">
+        <div key={p.id} className={s.snapshot}>
           <CollageCanvas
             ref={(n) => {
               if (n) nodes.current.set(p.id, n)
@@ -605,30 +578,30 @@ export function GiftWizard({ open, onClose, projectId }: { open: boolean; onClos
   }
 
   return (
-    <Modal open={open} onClose={close} label="Подарок с QR-кодом" className="flex h-[92dvh] max-w-4xl flex-col sm:h-[min(860px,92dvh)]" hideClose={busy}>
-      <header className="shrink-0 border-b border-line px-5 pb-4 pt-5 sm:px-8 sm:pt-6">
-        <p className="eyebrow flex items-center gap-1.5 text-accent">
+    <Modal open={open} onClose={close} label="Подарок с QR-кодом" className={s.dialog} hideClose={busy}>
+      <header className={s.head}>
+        <p className={`eyebrow ${s.headEyebrow}`}>
           <GiftIcon size={13} /> Подарок с QR-кодом
         </p>
-        <div className="mt-3 pr-10">
+        <div className={s.progressSlot}>
           <Progress step={step} />
         </div>
       </header>
 
-      <div ref={bodyRef} className="min-h-0 flex-1 overflow-y-auto px-5 py-6 scrollbar-thin sm:px-8">
+      <div ref={bodyRef} className={`scrollbar-thin ${s.body}`}>
         {step === 0 ? <CollagesStep projects={activeProjects} selected={selected} setSelected={setSelected} /> : null}
         {step === 1 ? <WordsStep words={words} setWords={setWords} /> : null}
         {step === 2 ? <SurpriseStep occasion={words.occasion} opening={opening} setOpening={setOpening} music={music} setMusic={setMusic} /> : null}
         {step === 3 && gift ? <DoneStep gift={gift} /> : null}
       </div>
 
-      <footer className="flex shrink-0 items-center gap-2 border-t border-line px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-8">
+      <footer className={s.foot}>
         {step === 3 ? (
           <>
             <button className="btn btn-ghost" onClick={reset}>
               <GiftIcon size={16} /> Ещё один подарок
             </button>
-            <button className="btn btn-primary ml-auto" onClick={close}>
+            <button className={`btn btn-primary ${s.pushRight}`} onClick={close}>
               Готово
             </button>
           </>
@@ -643,8 +616,8 @@ export function GiftWizard({ open, onClose, projectId }: { open: boolean; onClos
                 <X size={16} /> Отмена
               </button>
             )}
-            <span className="ml-auto hidden text-xs text-muted sm:block">{step === 0 && chosen.length ? `Выбрано: ${chosen.length}` : ""}</span>
-            <button className={`btn ${step === 2 ? "btn-accent" : "btn-primary"} ml-auto sm:ml-2`} onClick={next} disabled={busy} aria-disabled={!!blocker}>
+            <span className={s.selectedCount}>{step === 0 && chosen.length ? `Выбрано: ${chosen.length}` : ""}</span>
+            <button className={cx("btn", step === 2 ? "btn-accent" : "btn-primary", s.pushRight, s.next)} onClick={next} disabled={busy} aria-disabled={!!blocker}>
               {busy ? <Loader2 size={16} className="animate-spin" /> : null}
               {busy ? (stage ? "Готовим коллажи…" : "Сохраняем подарок…") : step === 2 ? "Создать подарок" : "Далее"}
               {!busy && step < 2 ? <ArrowRight size={16} /> : null}

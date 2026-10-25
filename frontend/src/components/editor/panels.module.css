@@ -1,0 +1,530 @@
+.group {
+  margin-bottom: 1.75rem;
+}
+.groupSpaced {
+  margin-top: 1.75rem;
+}
+.groupHead {
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.muted {
+  color: var(--muted);
+}
+.accent {
+  color: var(--accent);
+}
+.wide {
+  width: 100%;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* ---------- Templates ---------- */
+.thumbs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+}
+.tile {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  box-shadow: 0 0 0 1px var(--line);
+  transition: all 0.15s var(--ease);
+}
+.tile:hover {
+  box-shadow: 0 0 0 1px var(--line-strong);
+}
+.tileActive,
+.tileActive:hover {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+.check {
+  position: absolute;
+  right: 0.375rem;
+  top: 0.375rem;
+  display: grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.layout {
+  text-align: left;
+}
+.layoutName {
+  margin-top: 0.375rem;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+}
+.layoutSlots {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ---------- Photos ---------- */
+.drop {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 1rem;
+  border: 1.5px dashed var(--line-strong);
+  background: var(--bg);
+  padding: 1.75rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease);
+}
+.drop:hover {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent-soft) 40%, transparent);
+}
+.dropIcon {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  transition: scale 0.15s var(--ease);
+}
+.drop:hover .dropIcon {
+  scale: 1.05;
+}
+.dropTitle {
+  font-size: 15px;
+  font-weight: 600;
+}
+.small {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+.demo {
+  margin-top: 0.5rem;
+  width: 100%;
+  color: var(--muted);
+}
+.progress {
+  margin-top: 1.25rem;
+  border-radius: 1rem;
+  background: var(--surface-2);
+  padding: 1rem;
+}
+.progressHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.bold {
+  font-weight: 600;
+}
+.done {
+  color: var(--sage);
+}
+.bars {
+  margin-top: 0.625rem;
+  display: flex;
+  gap: 0.25rem;
+}
+.bar {
+  height: 0.375rem;
+  flex: 1;
+  border-radius: 999px;
+  background: var(--surface-3);
+}
+.barFilled {
+  background: var(--accent);
+}
+.autofill {
+  margin-top: 1rem;
+  width: 100%;
+}
+.needUploads {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+.uploadsHint {
+  margin: -0.25rem 0 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1.625;
+  color: var(--muted);
+}
+.uploads {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.upload {
+  position: relative;
+}
+.uploadButton {
+  display: block;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: var(--surface-2);
+  box-shadow: 0 0 0 1px var(--line);
+  transition: box-shadow 0.15s var(--ease);
+}
+.uploadButton:hover {
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.cover {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+.usedMark {
+  pointer-events: none;
+  position: absolute;
+  bottom: 0.25rem;
+  left: 0.25rem;
+  display: grid;
+  width: 1rem;
+  height: 1rem;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.remove {
+  position: absolute;
+  right: 0.25rem;
+  top: 0.25rem;
+  display: grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  place-items: center;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.6);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.15s var(--ease);
+}
+.upload:hover .remove {
+  opacity: 1;
+}
+@media (width < 64rem) {
+  .remove {
+    opacity: 1;
+  }
+}
+.tip {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1.625;
+  color: var(--muted);
+}
+
+/* ---------- Text ---------- */
+.field {
+  display: block;
+}
+.fieldLabel {
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.textarea {
+  width: 100%;
+  resize: none;
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.375;
+  outline: none;
+  transition: border-color 0.15s var(--ease);
+}
+.textarea:focus {
+  border-color: var(--line-strong);
+}
+.textareaActive,
+.textareaActive:focus {
+  border-color: var(--accent);
+}
+.addTitle,
+.addOption {
+  border-radius: 0.75rem;
+  background: var(--surface-2);
+  text-align: left;
+  transition: background-color 0.15s var(--ease);
+}
+.addTitle:hover,
+.addOption:hover {
+  background: var(--surface-3);
+}
+.addStack > :not(:last-child) {
+  margin-bottom: 0.5rem;
+}
+.addTitle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+.addGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.addOption {
+  padding: 0.625rem 0.75rem;
+}
+.addSubtitle {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+.addHand {
+  padding-block: 0.5rem;
+  font-family: var(--font-hand);
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+.addMeta {
+  grid-column: span 2 / span 2;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+.fields > :not(:last-child) {
+  margin-bottom: 0.75rem;
+}
+
+/* ---------- Caption assistant ---------- */
+.assistant {
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  padding: 1rem;
+}
+.assistantHead {
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.assistantIcon {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.assistantTitle {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+}
+.assistantSub {
+  font-size: 11px;
+  color: var(--muted);
+}
+.topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+.topic {
+  height: 1.75rem;
+  padding: 0 0.625rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+.suggest {
+  margin-top: 0.75rem;
+  width: 100%;
+}
+.suggestions {
+  margin-top: 0.75rem;
+}
+.suggestions > :not(:last-child) {
+  margin-bottom: 0.375rem;
+}
+.suggestionSkeleton {
+  height: 2.25rem;
+  border-radius: 0.75rem;
+}
+.suggestion {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  background: var(--surface);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  box-shadow: 0 0 0 1px var(--line);
+  transition: box-shadow 0.15s var(--ease);
+}
+.suggestion:hover {
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.suggestionIcon {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.more {
+  width: 100%;
+  padding: 0.375rem 0;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.more:hover {
+  color: var(--ink);
+}
+
+/* ---------- Background ---------- */
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.swatch {
+  aspect-ratio: 1 / 1;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.1);
+  transition: scale 0.15s var(--ease);
+}
+.swatch:hover {
+  scale: 1.1;
+}
+.swatchActive {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.customColor {
+  position: relative;
+  display: grid;
+  aspect-ratio: 1 / 1;
+  cursor: pointer;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px dashed var(--line-strong);
+  color: var(--muted);
+}
+.customColor:hover {
+  color: var(--ink);
+}
+.colorInput {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  opacity: 0;
+}
+.palettes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.palette {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+  padding: 0.5rem;
+  text-align: left;
+  transition: all 0.15s var(--ease);
+}
+.palette:hover {
+  border-color: var(--line-strong);
+}
+.paletteActive,
+.paletteActive:hover {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent-soft) 40%, transparent);
+}
+.paletteSwatch {
+  display: flex;
+  height: 2rem;
+  width: 2.75rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.1);
+}
+.flex2 {
+  flex: 2;
+}
+.flex1 {
+  flex: 1;
+}
+.paletteName {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ---------- Decor ---------- */
+.decos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.deco {
+  display: grid;
+  aspect-ratio: 1 / 1;
+  place-items: center;
+  border-radius: 0.75rem;
+  background: var(--surface-2);
+  transition: background-color 0.15s var(--ease);
+}
+.deco:hover {
+  background: var(--surface-3);
+}
+.decoArt {
+  display: block;
+}
+.decorNote {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--muted);
+}

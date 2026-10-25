@@ -42,6 +42,7 @@ import { EditorCtx, useHistory, type EditorApi, type Tool } from "./context"
 import { ExportDialog } from "./ExportDialog"
 import { PHOTO_MIME, PhotosPanel, TemplatesPanel, TextPanel } from "./panels"
 import { PreviewOverlay } from "./PreviewOverlay"
+import s from "./Editor.module.css"
 
 const TOOLS: { key: Tool; label: string; title: string; icon: typeof Images }[] = [
   { key: "templates", label: "Шаблон", title: "Шаблоны и композиция", icon: LayoutTemplate },
@@ -94,9 +95,9 @@ function SaveStatus({ state, onSave }: { state: "saved" | "saving" | "unsaved"; 
       </button>
     )
   return (
-    <span className="flex items-center gap-1.5 text-xs font-medium text-muted" aria-live="polite">
-      {state === "saving" ? <Loader2 size={14} className="animate-spin" /> : <CloudCheck size={15} className="text-sage" />}
-      <span className="max-lg:hidden">{state === "saving" ? "Сохранение…" : "Сохранено"}</span>
+    <span className={s.status} aria-live="polite">
+      {state === "saving" ? <Loader2 size={14} className="animate-spin" /> : <CloudCheck size={15} className={s.saved} />}
+      <span className={s.statusLabel}>{state === "saving" ? "Сохранение…" : "Сохранено"}</span>
     </span>
   )
 }
@@ -444,7 +445,7 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
 
   return (
     <EditorCtx.Provider value={api}>
-      <div className="flex h-dvh flex-col overflow-hidden bg-bg" {...rootDrag}>
+      <div className={s.root} {...rootDrag}>
         <input
           ref={fileRef}
           type="file"
@@ -458,7 +459,7 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
         />
 
         {/* ---------- top bar ---------- */}
-        <header className="flex h-14 shrink-0 items-center gap-1 border-b border-line bg-surface px-2 sm:h-16 sm:gap-2 sm:px-4">
+        <header className={s.top}>
           <button className="icon-btn" onClick={goBack} aria-label="Назад к проектам" title="Назад к проектам">
             <ArrowLeft size={19} />
           </button>
@@ -467,51 +468,49 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
             onChange={(e) => setName(e.target.value)}
             onBlur={() => renameProject(project.id, name)}
             onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
-            className="h-9 w-full min-w-0 max-w-[260px] truncate rounded-lg bg-transparent px-2 font-serif text-lg font-semibold outline-none transition-colors hover:bg-surface-2 focus:bg-surface-2 sm:text-xl"
+            className={s.name}
             aria-label="Название проекта"
           />
-          <div className="mx-1 hidden h-6 w-px bg-line sm:block" />
+          <div className={s.divider} />
           <button className="icon-btn" onClick={undo} disabled={!canUndo} aria-label="Отменить" title="Отменить (Ctrl+Z)">
             <Undo2 size={18} />
           </button>
           <button className="icon-btn" onClick={redo} disabled={!canRedo} aria-label="Повторить" title="Повторить (Ctrl+Shift+Z)">
             <Redo2 size={18} />
           </button>
-          <div className="ml-1 hidden sm:block">
+          <div className={s.saveSlot}>
             <SaveStatus state={saveState} onSave={saveNow} />
           </div>
-          <div className="ml-auto flex items-center gap-1 sm:gap-2">
-            <button className="btn btn-ghost max-sm:hidden" onClick={() => setPreview(true)}>
+          <div className={s.actions}>
+            <button className={`btn btn-ghost ${s.previewButton}`} onClick={() => setPreview(true)}>
               <Eye size={17} /> Предпросмотр
             </button>
-            <button className="icon-btn sm:hidden" onClick={() => setPreview(true)} aria-label="Предпросмотр">
+            <button className={`icon-btn ${s.previewIcon}`} onClick={() => setPreview(true)} aria-label="Предпросмотр">
               <Eye size={19} />
             </button>
-            <button className="btn btn-accent max-sm:size-10 max-sm:px-0" onClick={() => setExportOpen(true)} aria-label="Скачать">
-              <Download size={17} /> <span className="max-sm:hidden">Скачать</span>
+            <button className={`btn btn-accent ${s.download}`} onClick={() => setExportOpen(true)} aria-label="Скачать">
+              <Download size={17} /> <span className={s.downloadLabel}>Скачать</span>
             </button>
           </div>
         </header>
 
-        <div className="relative flex min-h-0 flex-1">
+        <div className={s.body}>
           {/* ---------- tool rail ---------- */}
           {!mobile ? (
-            <nav className="flex w-[76px] shrink-0 flex-col items-center gap-1 border-r border-line bg-surface py-3" aria-label="Инструменты">
+            <nav className={s.rail} aria-label="Инструменты">
               {TOOLS.map((t) => {
                 const active = tool === t.key
                 return (
                   <button
                     key={t.key}
                     onClick={() => setToolState(active ? null : t.key)}
-                    className={`relative flex w-[62px] flex-col items-center gap-1 rounded-xl py-2.5 text-[11px] font-semibold transition-colors ${
-                      active ? "bg-surface-2 text-ink" : "text-muted hover:bg-surface-2/60 hover:text-ink"
-                    }`}
+                    className={`${s.railButton} ${active ? s.railActive : ""}`}
                     aria-pressed={active}
                   >
-                    <t.icon size={20} strokeWidth={active ? 2.1 : 1.8} className={active ? "text-accent" : ""} />
+                    <t.icon size={20} strokeWidth={active ? 2.1 : 1.8} className={active ? s.accent : ""} />
                     {t.label}
                     {t.key === "photos" && empty ? (
-                      <span className="absolute right-2 top-1.5 grid min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] text-accent-ink">
+                      <span className={s.railBadge}>
                         {empty}
                       </span>
                     ) : null}
@@ -523,39 +522,39 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
 
           {/* ---------- side panel ---------- */}
           {!mobile && activeTool ? (
-            <aside className="animate-fade-in flex w-[290px] shrink-0 flex-col border-r border-line bg-surface lg:w-[330px]">
-              <div className="flex h-14 shrink-0 items-center justify-between pl-5 pr-2">
-                <h2 className="text-[15px] font-semibold">{activeTool.title}</h2>
-                <button className="icon-btn text-muted" onClick={() => setToolState(null)} aria-label="Скрыть панель" title="Скрыть панель">
+            <aside className={`animate-fade-in ${s.panel}`}>
+              <div className={s.panelHead}>
+                <h2 className={s.panelTitle}>{activeTool.title}</h2>
+                <button className={`icon-btn ${s.mutedButton}`} onClick={() => setToolState(null)} aria-label="Скрыть панель" title="Скрыть панель">
                   <PanelLeftClose size={18} />
                 </button>
               </div>
-              <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-6 scrollbar-thin">
+              <div className={`scrollbar-thin ${s.panelBody}`}>
                 <PanelBody tool={activeTool.key} />
               </div>
             </aside>
           ) : null}
 
           {/* ---------- workspace ---------- */}
-          <main className="relative flex min-w-0 flex-1 flex-col bg-surface-2">
+          <main className={s.workspace}>
             <div
               ref={areaRef}
-              className="relative min-h-0 flex-1 overflow-auto scrollbar-thin"
+              className={`scrollbar-thin ${s.area}`}
               onPointerDown={(e) => {
-                if (!(e.target as HTMLElement).closest(".collage-el")) select(null)
+                if (!(e.target as HTMLElement).closest("[data-el-id]")) select(null)
               }}
             >
               <div
-                className="flex min-h-full items-center justify-center"
+                className={s.stage}
                 style={{ padding: `${padY / 2}px ${padX / 2}px`, minWidth: canvasW + padX, width: "100%" }}
               >
-                <div className="relative shrink-0" style={{ width: canvasW }}>
+                <div className={s.canvasBox} style={{ width: canvasW }}>
                   <CollageCanvas
                     ref={canvasRef}
                     doc={doc}
                     editable
                     imgWidth={1000}
-                    className="shadow-float"
+                    className={s.canvas}
                     selectedId={selectedId}
                     editingId={editingId}
                     dropTargetId={dropTarget}
@@ -577,48 +576,48 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
                     onPhotoDragLeave={() => setDropTarget(null)}
                     onPhotoDrop={onPhotoDrop}
                   />
-                  {guides.v ? <span className="pointer-events-none absolute inset-y-0 left-1/2 w-px bg-accent/70" /> : null}
-                  {guides.h ? <span className="pointer-events-none absolute inset-x-0 top-1/2 h-px bg-accent/70" /> : null}
+                  {guides.v ? <span className={s.guideV} /> : null}
+                  {guides.h ? <span className={s.guideH} /> : null}
                 </div>
               </div>
             </div>
 
             {/* context toolbar for the selected element */}
             {!mobile ? (
-              <div className="pointer-events-none absolute inset-x-0 top-4 z-10 flex justify-center px-4">
-                <div className="pointer-events-auto">
+              <div className={s.contextSlot}>
+                <div className={s.auto}>
                   <ContextBar />
                 </div>
               </div>
             ) : null}
 
             {/* bottom: empty-slot hint and zoom */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-3 z-10 flex items-end justify-between gap-3 px-3 sm:bottom-4 sm:px-4">
-              <div className="min-w-0">
+            <div className={s.bottomBar}>
+              <div className={s.minW0}>
                 {empty && !selected ? (
-                  <div className="animate-fade-up pointer-events-auto flex items-center gap-2 rounded-full border border-line bg-surface py-1.5 pl-3.5 pr-1.5 text-[13px] shadow-card">
-                    <span className="size-2 shrink-0 animate-pulse rounded-full bg-accent" />
-                    <span className="truncate">
+                  <div className={`animate-fade-up ${s.hint}`}>
+                    <span className={`animate-pulse ${s.hintDot}`} />
+                    <span className={s.truncate}>
                       Осталось заполнить: <b>{empty}</b>
-                      <span className="text-muted max-md:hidden"> — нажмите на пустую рамку</span>
+                      <span className={s.hintMuted}> — нажмите на пустую рамку</span>
                     </span>
-                    <button className="btn btn-sm btn-primary h-8" onClick={() => openFilePicker()}>
-                      <Upload size={14} /> <span className="max-sm:hidden">Загрузить</span>
+                    <button className={`btn btn-sm btn-primary ${s.upload}`} onClick={() => openFilePicker()}>
+                      <Upload size={14} /> <span className={s.uploadLabel}>Загрузить</span>
                     </button>
                   </div>
                 ) : null}
               </div>
               {!mobile ? (
-                <div className="pointer-events-auto flex shrink-0 items-center gap-0.5 rounded-full border border-line bg-surface p-1 shadow-soft">
-                  <button className="icon-btn size-8" disabled={zoomIdx <= 0} onClick={() => setZoom(ZOOMS[zoomIdx - 1])} aria-label="Уменьшить">
+                <div className={s.zoom}>
+                  <button className={`icon-btn ${s.zoomButton}`} disabled={zoomIdx <= 0} onClick={() => setZoom(ZOOMS[zoomIdx - 1])} aria-label="Уменьшить">
                     <Minus size={15} />
                   </button>
-                  <span className="w-12 text-center text-xs font-semibold tabular-nums">{Math.round(zoom * 100)}%</span>
-                  <button className="icon-btn size-8" disabled={zoomIdx >= ZOOMS.length - 1} onClick={() => setZoom(ZOOMS[zoomIdx + 1])} aria-label="Увеличить">
+                  <span className={s.zoomValue}>{Math.round(zoom * 100)}%</span>
+                  <button className={`icon-btn ${s.zoomButton}`} disabled={zoomIdx >= ZOOMS.length - 1} onClick={() => setZoom(ZOOMS[zoomIdx + 1])} aria-label="Увеличить">
                     <Plus size={15} />
                   </button>
-                  <span className="mx-0.5 h-5 w-px bg-line" />
-                  <button className="icon-btn size-8" onClick={() => setZoom(1)} aria-label="Вписать в экран" title="Вписать в экран">
+                  <span className={s.zoomSeparator} />
+                  <button className={`icon-btn ${s.zoomButton}`} onClick={() => setZoom(1)} aria-label="Вписать в экран" title="Вписать в экран">
                     <Maximize size={14} />
                   </button>
                 </div>
@@ -626,8 +625,8 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
             </div>
 
             {fileDrag ? (
-              <div className="pointer-events-none absolute inset-3 z-20 grid place-items-center rounded-3xl border-2 border-dashed border-accent bg-accent-soft/70">
-                <p className="flex items-center gap-2 text-lg font-semibold text-accent">
+              <div className={s.dropzone}>
+                <p className={s.dropText}>
                   <Upload size={20} /> Отпустите — разложим фото по рамкам
                 </p>
               </div>
@@ -639,14 +638,14 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
         {mobile ? (
           <>
             {selected && !tool ? (
-              <div className="pointer-events-none fixed inset-x-0 bottom-[76px] z-30 flex justify-center px-3">
-                <div className="pointer-events-auto max-w-full">
+              <div className={s.mobileContext}>
+                <div className={s.mobileContextInner}>
                   <ContextBar side="top" />
                 </div>
               </div>
             ) : null}
             <nav
-              className="z-40 flex h-[68px] shrink-0 items-stretch justify-around border-t border-line bg-surface pb-[env(safe-area-inset-bottom)]"
+              className={s.tabs}
               aria-label="Инструменты"
             >
               {TOOLS.map((t) => {
@@ -655,27 +654,27 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
                   <button
                     key={t.key}
                     onClick={() => setToolState(active ? null : t.key)}
-                    className={`relative flex flex-1 flex-col items-center justify-center gap-1 text-[11px] font-semibold ${active ? "text-accent" : "text-muted"}`}
+                    className={`${s.tab} ${active ? s.tabActive : ""}`}
                   >
                     <t.icon size={21} strokeWidth={active ? 2.2 : 1.8} />
                     {t.label}
-                    {t.key === "photos" && empty ? <span className="absolute right-[calc(50%-18px)] top-2.5 size-2 rounded-full bg-accent" /> : null}
+                    {t.key === "photos" && empty ? <span className={s.tabDot} /> : null}
                   </button>
                 )
               })}
             </nav>
             {activeTool ? (
-              <div className="fixed inset-x-0 bottom-[68px] z-30 flex max-h-[58dvh] flex-col rounded-t-3xl border-t border-line bg-surface shadow-float animate-sheet-up">
-                <div className="flex shrink-0 items-center justify-between py-2 pl-5 pr-2">
-                  <span className="mx-auto h-1 w-10 rounded-full bg-line-strong" />
+              <div className={`animate-sheet-up ${s.sheet}`}>
+                <div className={s.gripRow}>
+                  <span className={s.grip} />
                 </div>
-                <div className="-mt-2 flex shrink-0 items-center justify-between pb-2 pl-5 pr-2">
-                  <h2 className="text-[15px] font-semibold">{activeTool.title}</h2>
-                  <button className="icon-btn text-muted" onClick={() => setToolState(null)} aria-label="Закрыть">
+                <div className={s.sheetHead}>
+                  <h2 className={s.panelTitle}>{activeTool.title}</h2>
+                  <button className={`icon-btn ${s.mutedButton}`} onClick={() => setToolState(null)} aria-label="Закрыть">
                     <X size={18} />
                   </button>
                 </div>
-                <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-6">
+                <div className={s.panelBody}>
                   <PanelBody tool={activeTool.key} />
                 </div>
               </div>

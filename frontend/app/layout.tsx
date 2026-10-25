@@ -4,8 +4,9 @@ import { AppProvider, THEME_SCRIPT } from "@/src/components/providers/AppProvide
 import { QueryProvider } from "@/src/components/providers/QueryProvider"
 import { Toaster } from "@/src/components/ui/Toaster"
 import "./globals.css"
-import "./gift.css"
 
+// Only the interface text (Manrope) and the display headings (Cormorant) are preloaded on every page.
+// The collage and gift faces load when something on screen uses them, so they don't hold up first paint.
 const manrope = Manrope({ variable: "--font-manrope", subsets: ["latin", "cyrillic"] })
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -18,10 +19,16 @@ const playfair = Playfair_Display({
   subsets: ["latin", "cyrillic"],
   weight: ["400", "500", "600"],
   style: ["normal", "italic"],
+  preload: false,
 })
-const caveat = Caveat({ variable: "--font-caveat", subsets: ["latin", "cyrillic"], weight: ["400", "500", "600", "700"] })
-const marck = Marck_Script({ variable: "--font-marck", subsets: ["latin", "cyrillic"], weight: "400" })
-const plexMono = IBM_Plex_Mono({ variable: "--font-plex-mono", subsets: ["latin", "cyrillic"], weight: ["400", "500", "600"] })
+const caveat = Caveat({ variable: "--font-caveat", subsets: ["latin", "cyrillic"], weight: ["400", "500", "600", "700"], preload: false })
+const marck = Marck_Script({ variable: "--font-marck", subsets: ["latin", "cyrillic"], weight: "400", preload: false })
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
+  subsets: ["latin", "cyrillic"],
+  weight: ["400", "500", "600"],
+  preload: false,
+})
 
 export const metadata: Metadata = {
   title: {
@@ -41,11 +48,11 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   const fonts = [manrope, cormorant, playfair, caveat, marck, plexMono].map((f) => f.variable).join(" ")
   return (
-    <html lang="ru" data-theme="light" className={`${fonts} h-full antialiased`} suppressHydrationWarning>
+    <html lang="ru" data-theme="light" className={fonts} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
-      <body className="min-h-full">
+      <body>
         <QueryProvider>
           <AppProvider>
             {children}

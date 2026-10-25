@@ -1,0 +1,81 @@
+.share {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.qrFrame {
+  border-radius: 28px;
+  background: #fff;
+  padding: 1rem;
+  box-shadow: 0 0 0 1px var(--line), var(--shadow-card);
+}
+.qr {
+  width: 208px;
+  height: 208px;
+  image-rendering: pixelated;
+}
+.qrSkeleton {
+  width: 208px;
+  height: 208px;
+  border-radius: 0.75rem;
+}
+@media (min-width: 40rem) {
+  .qr,
+  .qrSkeleton {
+    width: 232px;
+    height: 232px;
+  }
+}
+.caption {
+  margin-top: 0.75rem;
+  font-family: var(--font-hand);
+  font-size: 1.5rem;
+  line-height: 2rem;
+  color: var(--muted);
+}
+.link {
+  margin-top: 1.25rem;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  padding: 0.25rem 0.25rem 0.25rem 1rem;
+}
+.url {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  font-size: 13px;
+  color: var(--muted);
+  user-select: all;
+}
+.copy {
+  flex-shrink: 0;
+}
+.copied {
+  color: var(--sage);
+}
+@media (width < 421px) {
+  .labelLong {
+    display: none;
+  }
+}
+@media (width >= 421px) {
+  .labelShort {
+    display: none;
+  }
+}
+.actions {
+  margin-top: 0.75rem;
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}

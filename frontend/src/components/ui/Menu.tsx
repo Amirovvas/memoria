@@ -2,6 +2,8 @@
 
 import { Check, ChevronDown } from "lucide-react"
 import { useEffect, useRef, useState, type ReactNode } from "react"
+import { cx } from "@/src/lib/cx"
+import s from "./Menu.module.css"
 
 /** Small popover anchored to its trigger; closes on outside click and Escape. */
 export function Popover({
@@ -41,16 +43,12 @@ export function Popover({
   }, [open, onOpenChange])
 
   const close = () => setOpen(false)
-  const pos = align === "right" ? "right-0" : align === "center" ? "left-1/2 -translate-x-1/2" : "left-0"
+  const pos = align === "right" ? s.alignRight : align === "center" ? s.alignCenter : s.alignLeft
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className={s.root}>
       {trigger({ open, toggle: () => setOpen(!open) })}
       {open ? (
-        <div
-          className={`animate-pop-in absolute z-50 min-w-48 rounded-2xl border border-line bg-surface p-1.5 shadow-card ${pos} ${
-            side === "top" ? "bottom-full mb-2" : "top-full mt-2"
-          } ${className}`}
-        >
+        <div className={cx("animate-pop-in", s.panel, pos, side === "top" ? s.sideTop : s.sideBottom, className)}>
           {typeof children === "function" ? children(close) : children}
         </div>
       ) : null}
@@ -74,13 +72,11 @@ export function MenuItem({
   return (
     <button
       onClick={onClick}
-      className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-medium transition-colors hover:bg-surface-2 ${
-        danger ? "text-accent" : "text-ink"
-      }`}
+      className={cx(s.item, danger && s.danger)}
     >
-      {icon ? <span className="text-muted [&>svg]:size-4">{icon}</span> : null}
-      <span className="flex-1">{children}</span>
-      {active ? <Check size={15} className="text-accent" /> : null}
+      {icon ? <span className={s.itemIcon}>{icon}</span> : null}
+      <span className={s.itemLabel}>{children}</span>
+      {active ? <Check size={15} className={s.check} /> : null}
     </button>
   )
 }
@@ -103,15 +99,15 @@ export function SelectChip<T extends string>({
     <Popover
       trigger={({ toggle, open }) => (
         <button className="chip" data-active={value ? "true" : undefined} onClick={toggle} aria-expanded={open}>
-          {current?.swatch ? <span className="size-3 rounded-full border border-black/10" style={{ background: current.swatch }} /> : null}
-          <span className={value ? "" : "text-muted"}>{label}:</span>
+          {current?.swatch ? <span className={s.swatch} style={{ background: current.swatch }} /> : null}
+          <span className={value ? "" : s.muted}>{label}:</span>
           <span>{current?.label ?? allLabel}</span>
-          <ChevronDown size={14} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+          <ChevronDown size={14} className={cx(s.chevron, open && s.chevronOpen)} />
         </button>
       )}
     >
       {(close) => (
-        <div className="max-h-72 overflow-auto">
+        <div className={s.list}>
           <MenuItem
             active={!value}
             onClick={() => {
@@ -125,7 +121,7 @@ export function SelectChip<T extends string>({
             <MenuItem
               key={o.value}
               active={o.value === value}
-              icon={o.swatch ? <span className="block size-4 rounded-full border border-black/10" style={{ background: o.swatch }} /> : undefined}
+              icon={o.swatch ? <span className={cx(s.swatch, s.swatchLg)} style={{ background: o.swatch }} /> : undefined}
               onClick={() => {
                 onChange(o.value)
                 close()

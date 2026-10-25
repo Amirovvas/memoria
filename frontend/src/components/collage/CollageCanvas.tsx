@@ -1,11 +1,12 @@
 "use client"
 
 import { ImagePlus } from "lucide-react"
-import type { CSSProperties, DragEvent, PointerEvent, Ref } from "react"
+import { memo, type CSSProperties, type DragEvent, type PointerEvent, type Ref } from "react"
 import { DECOS, FONTS, FORMATS, LOOKS, PALETTES, TONES, patternStyle } from "@/src/lib/collage/styles"
 import type { CollageDoc, CollageEl, DecoEl, PhotoEl, TextEl } from "@/src/lib/collage/types"
 import { cropOf, fallbackSrc, sizedSrc } from "@/src/lib/photos"
 import { DecoArt } from "./Deco"
+import s from "./CollageCanvas.module.css"
 
 export interface CanvasHandlers {
   selectedId?: string | null
@@ -74,16 +75,18 @@ function PhotoContent({ el, doc, index, imgWidth, editable }: { el: PhotoEl; doc
   const baseFilter = crop ? "none" : look ? look.filter : TONES[doc.tone].filter
   const photoFilter = el.mono ? `${baseFilter === "none" ? "" : `${baseFilter} `}grayscale(1) contrast(1.08)` : baseFilter
   const lookOverlay = look?.overlay ? (
-    <span className="pointer-events-none absolute inset-0" style={{ background: look.overlay, mixBlendMode: look.blend }} />
+    <span className={s.layer} style={{ background: look.overlay, mixBlendMode: look.blend }} />
   ) : null
   const image = el.src && crop ? (
-    <div className="relative h-full w-full overflow-hidden" style={{ borderRadius: radius }}>
+    <div className={s.clip} style={{ borderRadius: radius }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={el.src}
         alt=""
         draggable={false}
-        className="absolute block"
+        loading="lazy"
+        decoding="async"
+        className={s.cropped}
         style={{
           left: `${(-crop.x / crop.w) * 100}%`,
           top: `${(-crop.y / crop.h) * 100}%`,
@@ -95,7 +98,7 @@ function PhotoContent({ el, doc, index, imgWidth, editable }: { el: PhotoEl; doc
       />
     </div>
   ) : el.src ? (
-    <span className="relative block h-full w-full overflow-hidden" style={{ borderRadius: radius }}>
+    <span className={s.clip} style={{ borderRadius: radius }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={sizedSrc(el.src, imgWidth)}
@@ -103,20 +106,21 @@ function PhotoContent({ el, doc, index, imgWidth, editable }: { el: PhotoEl; doc
         crossOrigin="anonymous"
         draggable={false}
         loading="lazy"
+        decoding="async"
         onError={(e) => {
           const img = e.currentTarget
           if (img.dataset.fallback) return
           img.dataset.fallback = "1"
           img.src = fallbackSrc(el.id)
         }}
-        className="block h-full w-full object-cover"
+        className={s.photo}
         style={{ filter: photoFilter, borderRadius: radius }}
       />
       {lookOverlay}
     </span>
   ) : (
     <div
-      className="flex h-full w-full flex-col items-center justify-center text-center"
+      className={s.placeholder}
       style={{
         borderRadius: radius,
         background: `color-mix(in oklab, ${ink} 6%, ${paper})`,
@@ -135,7 +139,7 @@ function PhotoContent({ el, doc, index, imgWidth, editable }: { el: PhotoEl; doc
   if (treatment === "polaroid") {
     return (
       <div
-        className="relative h-full w-full"
+        className={s.frame}
         style={{
           background: paper,
           padding: "1.3cqw 1.3cqw 5.2cqw",
@@ -145,7 +149,7 @@ function PhotoContent({ el, doc, index, imgWidth, editable }: { el: PhotoEl; doc
         {image}
         {el.caption ? (
           <span
-            className="absolute inset-x-0 truncate text-center"
+            className={s.caption}
             style={{ bottom: "1.2cqw", fontFamily: FONTS.hand.css, fontSize: "2.6cqw", color: "#3a3128", lineHeight: 1 }}
           >
             {el.caption}
@@ -157,7 +161,7 @@ function PhotoContent({ el, doc, index, imgWidth, editable }: { el: PhotoEl; doc
   if (treatment === "border") {
     return (
       <div
-        className="h-full w-full"
+        className={s.fill}
         style={{
           background: paper,
           padding: "1cqw",
@@ -172,17 +176,17 @@ function PhotoContent({ el, doc, index, imgWidth, editable }: { el: PhotoEl; doc
   if (treatment === "film") {
     const holes = "repeating-linear-gradient(90deg, transparent 0 0.7cqw, #e8e0d2 0.7cqw 1.7cqw, transparent 1.7cqw 2.4cqw)"
     return (
-      <div className="relative h-full w-full" style={{ background: "#16130f", padding: "2.4cqw 0.9cqw" }}>
-        <div className="absolute inset-x-0" style={{ top: "0.75cqw", height: "0.9cqw", backgroundImage: holes, opacity: 0.9 }} />
-        <div className="absolute inset-x-0" style={{ bottom: "0.75cqw", height: "0.9cqw", backgroundImage: holes, opacity: 0.9 }} />
+      <div className={s.frame} style={{ background: "#16130f", padding: "2.4cqw 0.9cqw" }}>
+        <div className={s.strip} style={{ top: "0.75cqw", height: "0.9cqw", backgroundImage: holes, opacity: 0.9 }} />
+        <div className={s.strip} style={{ bottom: "0.75cqw", height: "0.9cqw", backgroundImage: holes, opacity: 0.9 }} />
         {image}
       </div>
     )
   }
   if (treatment === "torn") {
     return (
-      <div className="h-full w-full" style={{ filter: "drop-shadow(0 0.4cqw 0.6cqw rgb(30 20 10 / 0.22))" }}>
-        <div className="h-full w-full" style={{ background: paper, padding: "0.9cqw", clipPath: tornClip(el.id) }}>
+      <div className={s.fill} style={{ filter: "drop-shadow(0 0.4cqw 0.6cqw rgb(30 20 10 / 0.22))" }}>
+        <div className={s.fill} style={{ background: paper, padding: "0.9cqw", clipPath: tornClip(el.id) }}>
           {image}
         </div>
       </div>
@@ -192,10 +196,10 @@ function PhotoContent({ el, doc, index, imgWidth, editable }: { el: PhotoEl; doc
   if (el.plain && el.src && !crop && el.w >= 90 && el.h >= 40) {
     // A soft scrim keeps titles readable when they sit on top of a full-bleed photo.
     return (
-      <div className="relative h-full w-full">
+      <div className={s.frame}>
         {image}
         <div
-          className="pointer-events-none absolute inset-0"
+          className={s.layer}
           style={{
             background:
               "linear-gradient(to top, rgb(0 0 0 / 0.42), transparent 38%), linear-gradient(to bottom, rgb(0 0 0 / 0.22), transparent 18%), rgb(0 0 0 / 0.14)",
@@ -204,7 +208,7 @@ function PhotoContent({ el, doc, index, imgWidth, editable }: { el: PhotoEl; doc
       </div>
     )
   }
-  return <div className="h-full w-full">{image}</div>
+  return <div className={s.fill}>{image}</div>
 }
 
 function TextContent({
@@ -268,7 +272,8 @@ function DecoContent({ el }: { el: DecoEl }) {
   )
 }
 
-export function CollageCanvas({
+// Galleries draw a hundred of these; memo keeps them still when unrelated app state (a favourite, a toast) changes.
+export const CollageCanvas = memo(function CollageCanvas({
   doc,
   imgWidth = 700,
   editable = false,
@@ -294,13 +299,13 @@ export function CollageCanvas({
   return (
     <div
       ref={ref}
-      className={`collage ${className}`}
+      className={`${s.collage} ${className}`}
       data-edit={editable ? "true" : undefined}
       style={{ aspectRatio: `${ratio}`, background: doc.bg, ...style }}
       onPointerDown={editable ? onBackgroundPointerDown : undefined}
     >
       {doc.pattern !== "none" ? (
-        <div className="pointer-events-none absolute inset-0" style={patternStyle(doc.pattern, ink)} />
+        <div className={s.layer} style={patternStyle(doc.pattern, ink)} />
       ) : null}
 
       {doc.elements.map((el) => {
@@ -326,7 +331,7 @@ export function CollageCanvas({
         return (
           <div
             key={el.id}
-            className={`collage-el ${dropTargetId === el.id ? "slot-drop" : ""} ${locked ? "pointer-events-none" : ""}`}
+            className={`${s.el} ${dropTargetId === el.id ? s.drop : ""} ${locked ? s.locked : ""}`}
             data-el-id={editable && !locked ? el.id : undefined}
             data-editing={editing ? "true" : undefined}
             style={{ ...box, transform: el.rot ? `rotate(${el.rot}deg)` : undefined }}
@@ -337,13 +342,13 @@ export function CollageCanvas({
             onDrop={editable && el.kind === "photo" ? (e) => onPhotoDrop?.(e, el) : undefined}
           >
             {content}
-            {editable && !selected && !locked ? <span className="el-hover" /> : null}
+            {editable && !selected && !locked ? <span className={s.hover} /> : null}
             {selected ? (
               <>
-                <span className="el-selected" />
+                <span className={s.selected} />
                 {!editing ? (
                   <span
-                    className="el-handle"
+                    className={s.handle}
                     style={{ right: -8, bottom: -8, cursor: "nwse-resize" }}
                     onPointerDown={(e) => {
                       e.stopPropagation()
@@ -358,4 +363,4 @@ export function CollageCanvas({
       })}
     </div>
   )
-}
+})

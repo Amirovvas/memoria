@@ -23,6 +23,7 @@ import Link from "next/link"
 import { useSyncExternalStore, type ComponentType, type ReactNode } from "react"
 import type { CategoryIcon as IconKey } from "@/src/lib/catalog"
 import { useApp } from "../providers/AppProvider"
+import s from "./bits.module.css"
 
 const ICONS: Record<IconKey, ComponentType<LucideProps>> = {
   plane: Plane,
@@ -48,13 +49,13 @@ export function CategoryIcon({ icon, ...props }: { icon: IconKey } & LucideProps
 
 export function Logo({ compact }: { compact?: boolean }) {
   return (
-    <Link href="/" className="flex items-center gap-2.5" aria-label="Memoria — на главную">
-      <span className="relative grid size-9 shrink-0 place-items-center">
-        <span className="absolute inset-0 rotate-[-8deg] rounded-[9px] border border-line-strong bg-surface" />
-        <span className="absolute inset-0 rotate-[6deg] rounded-[9px] bg-accent" />
-        <span className="relative font-serif text-xl font-semibold italic leading-none text-accent-ink">M</span>
+    <Link href="/" className={s.logo} aria-label="Memoria — на главную">
+      <span className={s.mark}>
+        <span className={s.markBack} />
+        <span className={s.markFront} />
+        <span className={s.markLetter}>M</span>
       </span>
-      {!compact ? <span className="font-serif text-[26px] font-semibold leading-none tracking-tight">Memoria</span> : null}
+      {!compact ? <span className={s.wordmark}>Memoria</span> : null}
     </Link>
   )
 }
@@ -86,11 +87,11 @@ export function EmptyState({
   action?: ReactNode
 }) {
   return (
-    <div className="animate-fade-up mx-auto flex max-w-md flex-col items-center px-6 py-16 text-center">
+    <div className={`animate-fade-up ${s.empty}`}>
       {art}
-      <h3 className="display mt-6 text-3xl">{title}</h3>
-      <p className="mt-2 text-[15px] leading-relaxed text-muted">{text}</p>
-      {action ? <div className="mt-6 flex flex-wrap justify-center gap-2">{action}</div> : null}
+      <h3 className={`display ${s.emptyTitle}`}>{title}</h3>
+      <p className={s.emptyText}>{text}</p>
+      {action ? <div className={s.emptyActions}>{action}</div> : null}
     </div>
   )
 }
@@ -98,15 +99,15 @@ export function EmptyState({
 /** Three tilted blank polaroids — used as illustration in empty states. */
 export function EmptyArt({ icon }: { icon: ReactNode }) {
   return (
-    <div className="relative h-36 w-48">
-      <div className="absolute left-2 top-4 h-28 w-24 -rotate-12 rounded-sm border border-line bg-surface p-2 pb-6 shadow-card">
-        <div className="h-full w-full rounded-[2px] bg-surface-2" />
+    <div className={s.art}>
+      <div className={`${s.polaroid} ${s.polaroidLeft}`}>
+        <div className={s.photo} />
       </div>
-      <div className="absolute right-2 top-3 h-28 w-24 rotate-[10deg] rounded-sm border border-line bg-surface p-2 pb-6 shadow-card">
-        <div className="h-full w-full rounded-[2px] bg-surface-3" />
+      <div className={`${s.polaroid} ${s.polaroidRight}`}>
+        <div className={`${s.photo} ${s.photoAlt}`} />
       </div>
-      <div className="absolute left-1/2 top-0 grid h-32 w-26 -translate-x-1/2 place-items-center rounded-sm border border-line bg-surface p-2 pb-7 shadow-card">
-        <div className="grid h-full w-full place-items-center rounded-[2px] bg-accent-soft text-accent">{icon}</div>
+      <div className={`${s.polaroid} ${s.polaroidCenter}`}>
+        <div className={`${s.photo} ${s.photoIcon}`}>{icon}</div>
       </div>
     </div>
   )
@@ -162,10 +163,10 @@ export function SectionHeader({
   action?: ReactNode
 }) {
   return (
-    <div className="mb-5 flex items-end justify-between gap-4">
+    <div className={s.sectionHeader}>
       <div>
-        {eyebrow ? <p className="eyebrow mb-2">{eyebrow}</p> : null}
-        <h2 className="display text-[32px] sm:text-[38px]">{title}</h2>
+        {eyebrow ? <p className={`eyebrow ${s.sectionEyebrow}`}>{eyebrow}</p> : null}
+        <h2 className={`display ${s.sectionTitle}`}>{title}</h2>
       </div>
       {action}
     </div>

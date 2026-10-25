@@ -9,6 +9,8 @@ import { CollageCanvas } from "../collage/CollageCanvas"
 import { GiftWizard } from "../gift/GiftWizard"
 import { useApp } from "../providers/AppProvider"
 import { Modal } from "../ui/Modal"
+import { cx } from "@/src/lib/cx"
+import s from "./ExportDialog.module.css"
 
 type Choice = ExportFormat | "gift"
 
@@ -81,12 +83,12 @@ export function ExportDialog({
 
   return (
     <>
-      <Modal open={open} onClose={close} label="Скачать коллаж" className="max-w-5xl">
-        <div className="grid md:grid-cols-[minmax(0,1fr)_400px]">
-          <div className="flex items-center justify-center bg-surface-2 p-6 sm:p-10 md:rounded-l-3xl">
+      <Modal open={open} onClose={close} label="Скачать коллаж" className={s.dialog}>
+        <div className={s.layout}>
+          <div className={s.previewPane}>
             {/* The preview keeps the chosen output proportions, so the user sees margins before downloading. */}
             <div
-              className="flex w-full items-center justify-center shadow-float transition-all duration-300"
+              className={s.previewFrame}
               style={{ aspectRatio: `${w} / ${h}`, maxWidth: `min(100%, calc(56dvh * ${w / h}))`, background: doc.bg }}
             >
               <div style={{ width: ratio >= w / h ? "100%" : `${(ratio / (w / h)) * 100}%` }}>
@@ -95,17 +97,17 @@ export function ExportDialog({
             </div>
           </div>
 
-          <div className="flex flex-col p-6 sm:p-8">
+          <div className={s.side}>
             {state === "done" ? (
-              <div className="animate-fade-up my-auto text-center">
-                <span className="mx-auto grid size-16 place-items-center rounded-full bg-sage-soft text-sage">
+              <div className={`animate-fade-up ${s.done}`}>
+                <span className={s.doneIcon}>
                   <Check size={30} />
                 </span>
-                <h2 className="display mt-5 text-4xl">Готово!</h2>
-                <p className="mt-2 text-sm text-muted">
+                <h2 className={cx("display", s.title, s.doneTitle)}>Готово!</h2>
+                <p className={s.doneText}>
                   Файл {format.toUpperCase()} · {w} × {h} px сохранён в папку «Загрузки».
                 </p>
-                <div className="mt-8 flex flex-col gap-2">
+                <div className={s.doneActions}>
                   <button className="btn btn-lg btn-primary" onClick={close}>
                     Вернуться к коллажу
                   </button>
@@ -117,24 +119,24 @@ export function ExportDialog({
             ) : (
               <>
                 <p className="eyebrow">Экспорт</p>
-                <h2 className="display mt-1 text-4xl">Скачать коллаж</h2>
+                <h2 className={cx("display", s.title, s.titleSpaced)}>Скачать коллаж</h2>
 
-                <p className="mb-2 mt-6 text-sm font-semibold">Формат файла</p>
-                <div className="grid grid-cols-3 gap-2">
+                <p className={s.label}>Формат файла</p>
+                <div className={s.formats}>
                   {FORMAT_INFO.map((f) => (
                     <button
                       key={f.value}
                       onClick={() => setChoice(f.value)}
-                      className={`rounded-2xl border p-3 text-left transition ${f.value === "gift" ? "col-span-3 flex items-center gap-3 bg-[linear-gradient(120deg,var(--accent-soft),transparent)]" : ""} ${choice === f.value ? "border-ink bg-surface-2" : "border-line hover:border-line-strong"}`}
+                      className={cx(s.format, f.value === "gift" && s.formatGift)}
                       aria-pressed={choice === f.value}
                     >
-                      <f.icon size={18} className={`shrink-0 ${choice === f.value || f.value === "gift" ? "text-accent" : "text-muted"}`} />
-                      <span className="min-w-0">
-                        <span className={`block text-sm font-bold ${f.value === "gift" ? "" : "mt-2"}`}>{f.label}</span>
-                        <span className="block text-[11px] text-muted">{f.text}</span>
+                      <f.icon size={18} className={cx(s.formatIcon, (choice === f.value || f.value === "gift") && s.formatIconAccent)} />
+                      <span className={s.minW0}>
+                        <span className={cx(s.formatLabel, f.value !== "gift" && s.formatLabelSpaced)}>{f.label}</span>
+                        <span className={s.formatText}>{f.text}</span>
                       </span>
                       {f.value === "gift" ? (
-                        <span className="ml-auto rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-accent-ink">Новое</span>
+                        <span className={s.newBadge}>Новое</span>
                       ) : null}
                     </button>
                   ))}
@@ -142,30 +144,30 @@ export function ExportDialog({
 
                 {choice === "gift" ? (
                   <>
-                    <div className="mt-6 rounded-2xl bg-surface-2 p-5">
-                      <p className="display text-2xl">Сюрприз для друга</p>
-                      <p className="mt-1 text-sm text-muted">Друг сканирует QR телефоном и открывает анимированную страницу с вашими коллажами.</p>
-                      <ul className="mt-4 space-y-2.5">
+                    <div className={s.giftBox}>
+                      <p className={`display ${s.giftTitle}`}>Сюрприз для друга</p>
+                      <p className={s.giftText}>Друг сканирует QR телефоном и открывает анимированную страницу с вашими коллажами.</p>
+                      <ul className={s.points}>
                         {GIFT_POINTS.map((g) => (
-                          <li key={g.text} className="flex gap-3 text-sm">
-                            <g.icon size={17} className="mt-0.5 shrink-0 text-accent" />
+                          <li key={g.text} className={s.point}>
+                            <g.icon size={17} className={s.pointIcon} />
                             {g.text}
                           </li>
                         ))}
                       </ul>
                     </div>
-                    <button className="btn btn-lg btn-accent mt-auto w-full max-md:mt-6" onClick={startGift}>
+                    <button className={cx("btn btn-lg btn-accent", s.cta, s.giftCta)} onClick={startGift}>
                       <Gift size={18} /> Создать подарок
                     </button>
                   </>
                 ) : (
                   <>
-                    <p className="mb-2 mt-6 text-sm font-semibold">Размер</p>
-                    <div className="max-h-[300px] space-y-4 overflow-y-auto pr-1 scrollbar-thin">
+                    <p className={s.label}>Размер</p>
+                    <div className={`scrollbar-thin ${s.sizes}`}>
                       {GROUPS.map((g) => (
                         <div key={g.key}>
-                          <p className="eyebrow mb-1.5">{g.title}</p>
-                          <div className="space-y-1">
+                          <p className={`eyebrow ${s.groupEyebrow}`}>{g.title}</p>
+                          <div className={s.presets}>
                             {SIZE_PRESETS.filter((p) => p.group === g.key).map((p) => {
                               const fits = presetFit(p, ratio) >= 0.98
                               const active = p.id === presetId
@@ -173,19 +175,17 @@ export function ExportDialog({
                                 <button
                                   key={p.id}
                                   onClick={() => setPresetId(p.id)}
-                                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition ${active ? "bg-surface-2" : "hover:bg-surface-2/60"}`}
+                                  className={cx(s.preset, active && s.presetActive)}
                                 >
-                                  <span
-                                    className={`grid size-4 shrink-0 place-items-center rounded-full border-2 ${active ? "border-accent" : "border-line-strong"}`}
-                                  >
-                                    {active ? <span className="size-1.5 rounded-full bg-accent" /> : null}
+                                  <span className={s.radio}>
+                                    {active ? <span className={s.radioDot} /> : null}
                                   </span>
-                                  <span className="min-w-0 flex-1">
-                                    <span className="block text-sm font-semibold">{p.label}</span>
-                                    <span className="block text-xs text-muted">{p.hint}</span>
+                                  <span className={s.presetText}>
+                                    <span className={s.presetLabel}>{p.label}</span>
+                                    <span className={s.presetHint}>{p.hint}</span>
                                   </span>
                                   {fits && p.group !== "original" ? (
-                                    <span className="rounded-full bg-sage-soft px-2 py-0.5 text-[10px] font-bold text-sage">Подходит</span>
+                                    <span className={s.fits}>Подходит</span>
                                   ) : null}
                                 </button>
                               )
@@ -195,13 +195,13 @@ export function ExportDialog({
                       ))}
                     </div>
 
-                    <p className="mt-4 min-h-8 text-xs leading-relaxed text-muted">
+                    <p className={s.note}>
                       {letterbox
                         ? "Пропорции отличаются — коллаж будет аккуратно вписан с полями цвета фона."
                         : `${w} × ${h} px${format === "pdf" ? " · одна страница" : ""}`}
                     </p>
 
-                    <button className="btn btn-lg btn-accent mt-auto w-full" onClick={run} disabled={state === "working"}>
+                    <button className={`btn btn-lg btn-accent ${s.cta}`} onClick={run} disabled={state === "working"}>
                       {state === "working" ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
                       {state === "working" ? "Готовим файл…" : `Скачать ${format.toUpperCase()}`}
                     </button>

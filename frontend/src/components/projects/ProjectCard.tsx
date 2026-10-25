@@ -11,6 +11,7 @@ import { useApp, type Project } from "../providers/AppProvider"
 import { TimeAgo } from "../ui/bits"
 import { MenuItem, Popover } from "../ui/Menu"
 import { Modal } from "../ui/Modal"
+import s from "./ProjectCard.module.css"
 
 export function RenameDialog({
   open,
@@ -24,9 +25,9 @@ export function RenameDialog({
   onSave: (name: string) => void
 }) {
   return (
-    <Modal open={open} onClose={onClose} label="Переименовать проект" className="max-w-md">
+    <Modal open={open} onClose={onClose} label="Переименовать проект" className={s.dialog}>
       <form
-        className="p-6 sm:p-8"
+        className={s.form}
         onSubmit={(e) => {
           e.preventDefault()
           const value = new FormData(e.currentTarget).get("name")?.toString() ?? ""
@@ -34,10 +35,10 @@ export function RenameDialog({
           onClose()
         }}
       >
-        <h2 className="display text-3xl">Переименовать</h2>
-        <p className="mt-1 text-sm text-muted">Название видно только вам — в списке проектов и при экспорте.</p>
-        <input name="name" defaultValue={name} autoFocus maxLength={60} className="input mt-6 h-12 text-[15px]" />
-        <div className="mt-6 flex justify-end gap-2">
+        <h2 className={`display ${s.dialogTitle}`}>Переименовать</h2>
+        <p className={s.dialogText}>Название видно только вам — в списке проектов и при экспорте.</p>
+        <input name="name" defaultValue={name} autoFocus maxLength={60} className={`input ${s.nameInput}`} />
+        <div className={s.actions}>
           <button type="button" className="btn btn-ghost" onClick={onClose}>
             Отмена
           </button>
@@ -58,40 +59,31 @@ export function ProjectCard({ project: p, compact }: { project: Project; compact
   const empty = emptySlotCount(p.doc)
 
   return (
-    <article className="group animate-fade-up">
-      <Link
-        href={href}
-        className="relative flex aspect-[4/5] items-center justify-center overflow-hidden rounded-2xl bg-surface-2 p-[9%] ring-1 ring-line transition-all duration-300 hover:-translate-y-1 hover:shadow-card"
-      >
-        <div className="w-full transition-transform duration-500 group-hover:scale-[1.02]">
-          <CollageCanvas doc={p.doc} imgWidth={compact ? 320 : 420} className="shadow-card" />
+    <article className={`animate-fade-up ${s.card}`}>
+      <Link href={href} className={s.thumb}>
+        <div className={s.collage}>
+          <CollageCanvas doc={p.doc} imgWidth={compact ? 320 : 420} className={s.canvas} />
         </div>
-        {empty ? (
-          <span className="absolute left-3 top-3 rounded-full bg-surface/90 px-2.5 py-1 text-[11px] font-semibold text-muted backdrop-blur">
-            Черновик · {empty} пуст.
-          </span>
-        ) : null}
-        <span className="absolute inset-x-3 bottom-3 hidden translate-y-2 justify-center opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:flex">
-          <span className="btn btn-sm bg-white text-[#1f1b16] shadow-card">
+        {empty ? <span className={s.draft}>Черновик · {empty} пуст.</span> : null}
+        <span className={s.cta}>
+          <span className={`btn btn-sm ${s.ctaButton}`}>
             <PenLine size={14} /> Продолжить
           </span>
         </span>
       </Link>
-      <div className="mt-3 flex items-start gap-2 px-0.5">
-        <div className="min-w-0 flex-1">
-          <h3 className="truncate text-[15px] font-semibold">
-            <Link href={href} className="hover:text-accent">
-              {p.name}
-            </Link>
+      <div className={s.meta}>
+        <div className={s.info}>
+          <h3 className={s.name}>
+            <Link href={href}>{p.name}</Link>
           </h3>
-          <p className="mt-0.5 truncate text-[13px] text-muted">
+          <p className={s.sub}>
             {CATEGORY_BY_SLUG[p.category]?.short ?? "Коллаж"} · <TimeAgo ts={p.updatedAt} />
           </p>
         </div>
         <Popover
           align="right"
           trigger={({ toggle, open }) => (
-            <button className="icon-btn -mr-1 size-8 text-muted" onClick={toggle} aria-expanded={open} aria-label="Действия с проектом">
+            <button className={`icon-btn ${s.more}`} onClick={toggle} aria-expanded={open} aria-label="Действия с проектом">
               <Ellipsis size={18} />
             </button>
           )}
@@ -119,7 +111,7 @@ export function ProjectCard({ project: p, compact }: { project: Project; compact
               >
                 Дублировать
               </MenuItem>
-              <div className="my-1 h-px bg-line" />
+              <div className={s.separator} />
               <MenuItem
                 danger
                 icon={<Trash2 />}

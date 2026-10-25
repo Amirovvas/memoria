@@ -6,6 +6,7 @@ import { createPortal } from "react-dom"
 import { FORMATS } from "@/src/lib/collage/styles"
 import type { CollageDoc } from "@/src/lib/collage/types"
 import { CollageCanvas } from "../collage/CollageCanvas"
+import s from "./PreviewOverlay.module.css"
 
 const BACKDROPS = [
   { key: "dark", label: "Тёмный", bg: "#161310" },
@@ -41,35 +42,35 @@ export function PreviewOverlay({
 
   return createPortal(
     <div
-      className="animate-fade-in fixed inset-0 z-[75] flex flex-col transition-colors duration-500"
+      className={`animate-fade-in ${s.overlay}`}
       style={{ background: backdrop.bg, color: dark ? "#f2ece3" : "#1f1b16" }}
       role="dialog"
       aria-modal="true"
       aria-label="Предпросмотр коллажа"
     >
-      <header className="flex h-16 shrink-0 items-center gap-3 px-3 sm:px-6">
-        <button className={`btn btn-sm ${dark ? "bg-white/10 hover:bg-white/20" : "bg-black/5 hover:bg-black/10"}`} onClick={onClose}>
-          <ArrowLeft size={15} /> <span className="max-sm:hidden">К редактированию</span>
+      <header className={s.header}>
+        <button className={`btn btn-sm ${dark ? s.backDark : s.backLight}`} onClick={onClose}>
+          <ArrowLeft size={15} /> <span className={s.label}>К редактированию</span>
         </button>
-        <p className="min-w-0 flex-1 truncate text-center font-serif text-xl">{name}</p>
+        <p className={s.title}>{name}</p>
         <button className="btn btn-sm btn-accent" onClick={onDownload}>
-          <Download size={15} /> <span className="max-sm:hidden">Скачать</span>
+          <Download size={15} /> <span className={s.label}>Скачать</span>
         </button>
       </header>
-      <div className="flex min-h-0 flex-1 items-center justify-center p-4 sm:p-10">
-        <div className="animate-pop-in w-full" style={{ maxWidth: `min(100%, calc((100dvh - 180px) * ${ratio}))` }}>
+      <div className={s.stage}>
+        <div className={`animate-pop-in ${s.canvas}`} style={{ maxWidth: `min(100%, calc((100dvh - 180px) * ${ratio}))` }}>
           <CollageCanvas doc={doc} imgWidth={1600} style={{ boxShadow: "0 40px 80px -30px rgb(0 0 0 / 0.55)" }} />
         </div>
       </div>
-      <footer className="flex h-16 shrink-0 items-center justify-center gap-2">
+      <footer className={s.footer}>
         {BACKDROPS.map((b) => (
           <button
             key={b.key}
             onClick={() => setBackdrop(b)}
-            className="flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold transition"
+            className={s.backdrop}
             style={{ background: backdrop.key === b.key ? (dark ? "rgb(255 255 255 / 0.14)" : "rgb(0 0 0 / 0.08)") : "transparent" }}
           >
-            <span className="size-3.5 rounded-full ring-1 ring-black/20" style={{ background: b.bg }} />
+            <span className={s.dot} style={{ background: b.bg }} />
             {b.label}
           </button>
         ))}

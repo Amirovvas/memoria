@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { Suspense } from "react"
 import { TemplateGallery } from "@/src/components/templates/TemplateGallery"
 import { CATEGORIES, CATEGORY_BY_SLUG } from "@/src/lib/catalog"
+import s from "./page.module.css"
 
 export function generateStaticParams() {
   return CATEGORIES.map((c) => ({ slug: c.slug }))
@@ -21,7 +22,7 @@ async function Category({ params }: { params: Promise<{ slug: string }> }) {
 
 export default function Page({ params }: PageProps<"/category/[slug]">) {
   return (
-    <Suspense fallback={<div className="skeleton mx-4 mt-4 h-[280px] rounded-[28px] sm:mx-6 lg:mx-10" />}>
+    <Suspense fallback={<div className={`skeleton ${s.fallback}`} />}>
       <Category params={params} />
     </Suspense>
   )

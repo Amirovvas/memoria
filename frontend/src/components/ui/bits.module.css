@@ -1,0 +1,142 @@
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+.mark {
+  position: relative;
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  place-items: center;
+}
+.markBack,
+.markFront {
+  position: absolute;
+  inset: 0;
+  border-radius: 9px;
+}
+.markBack {
+  rotate: -8deg;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+}
+.markFront {
+  rotate: 6deg;
+  background: var(--accent);
+}
+.markLetter {
+  position: relative;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-style: italic;
+  line-height: 1;
+  color: var(--accent-ink);
+}
+.wordmark {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.empty {
+  margin: 0 auto;
+  display: flex;
+  max-width: 28rem;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 1.5rem;
+  text-align: center;
+}
+.emptyTitle {
+  margin-top: 1.5rem;
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+.emptyText {
+  margin-top: 0.5rem;
+  font-size: 15px;
+  line-height: 1.625;
+  color: var(--muted);
+}
+.emptyActions {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.art {
+  position: relative;
+  height: 9rem;
+  width: 12rem;
+}
+.polaroid {
+  position: absolute;
+  height: 7rem;
+  width: 6rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0.5rem 0.5rem 1.5rem;
+  box-shadow: var(--shadow-card);
+}
+.polaroidLeft {
+  left: 0.5rem;
+  top: 1rem;
+  rotate: -12deg;
+}
+.polaroidRight {
+  right: 0.5rem;
+  top: 0.75rem;
+  rotate: 10deg;
+}
+.polaroidCenter {
+  left: 50%;
+  top: 0;
+  display: grid;
+  height: 8rem;
+  width: 6.5rem;
+  translate: -50% 0;
+  place-items: center;
+  padding-bottom: 1.75rem;
+}
+.photo {
+  height: 100%;
+  width: 100%;
+  border-radius: 2px;
+  background: var(--surface-2);
+}
+.photoAlt {
+  background: var(--surface-3);
+}
+.photoIcon {
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.sectionHeader {
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.sectionEyebrow {
+  margin-bottom: 0.5rem;
+}
+.sectionTitle {
+  font-size: 32px;
+}
+@media (min-width: 40rem) {
+  .sectionTitle {
+    font-size: 38px;
+  }
+}

@@ -1,0 +1,15 @@
+.fallback {
+  margin: 1rem 1rem 0;
+  height: 280px;
+  border-radius: 28px;
+}
+@media (min-width: 40rem) {
+  .fallback {
+    margin-inline: 1.5rem;
+  }
+}
+@media (min-width: 64rem) {
+  .fallback {
+    margin-inline: 2.5rem;
+  }
+}

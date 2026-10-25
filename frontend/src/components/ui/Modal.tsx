@@ -3,6 +3,7 @@
 import { X } from "lucide-react"
 import { useEffect, type ReactNode } from "react"
 import { createPortal } from "react-dom"
+import s from "./Modal.module.css"
 
 export function Modal({
   open,
@@ -33,13 +34,11 @@ export function Modal({
 
   if (!open) return null
   return createPortal(
-    <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-label={label}>
-      <div className="animate-fade-in absolute inset-0 bg-[var(--scrim)]" onClick={onClose} />
-      <div
-        className={`animate-pop-in relative max-h-[92dvh] w-full overflow-auto rounded-t-3xl bg-surface shadow-float sm:rounded-3xl ${className}`}
-      >
+    <div className={s.overlay} role="dialog" aria-modal="true" aria-label={label}>
+      <div className={`animate-fade-in ${s.scrim}`} onClick={onClose} />
+      <div className={`animate-pop-in ${s.panel} ${className}`}>
         {!hideClose ? (
-          <button className="icon-btn absolute right-3 top-3 z-10 bg-surface/80 backdrop-blur" onClick={onClose} aria-label="Закрыть">
+          <button className={`icon-btn ${s.close}`} onClick={onClose} aria-label="Закрыть">
             <X size={18} />
           </button>
         ) : null}

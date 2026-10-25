@@ -3,13 +3,14 @@
 import { RotateCw, WifiOff } from "lucide-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, type ReactNode } from "react"
-import { useUser } from "@/src/hooks/useAuth"
+import { useUser } from "@/src/hooks/useUser"
 import { Logo } from "../ui/bits"
+import s from "./RequireAuth.module.css"
 
 /** Full-screen placeholder while the session is being checked. */
 export function AuthSplash() {
   return (
-    <div className="grid min-h-dvh place-items-center bg-bg">
+    <div className={s.screen}>
       <div className="animate-pulse">
         <Logo />
       </div>
@@ -38,14 +39,14 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 
   if (isError) {
     return (
-      <div className="grid min-h-dvh place-items-center bg-bg px-6 text-center">
-        <div className="animate-fade-up max-w-sm">
-          <span className="mx-auto grid size-14 place-items-center rounded-full bg-accent-soft text-accent">
+      <div className={`${s.screen} ${s.error}`}>
+        <div className={`animate-fade-up ${s.box}`}>
+          <span className={s.icon}>
             <WifiOff size={24} />
           </span>
-          <h1 className="display mt-5 text-4xl">Сервер недоступен</h1>
-          <p className="mt-2 text-[15px] leading-relaxed text-muted">Не получилось проверить вход. Проверьте интернет и попробуйте ещё раз.</p>
-          <button className="btn btn-primary mt-6" onClick={() => refetch()} disabled={isFetching}>
+          <h1 className={`display ${s.title}`}>Сервер недоступен</h1>
+          <p className={s.text}>Не получилось проверить вход. Проверьте интернет и попробуйте ещё раз.</p>
+          <button className={`btn btn-primary ${s.retry}`} onClick={() => refetch()} disabled={isFetching}>
             <RotateCw size={16} className={isFetching ? "animate-spin" : ""} /> Повторить
           </button>
         </div>

@@ -1,0 +1,113 @@
+/* Shared by LoginForm and RegisterForm */
+.title {
+  margin-top: 0.75rem;
+  font-size: 44px;
+}
+@media (min-width: 40rem) {
+  .title {
+    font-size: 52px;
+  }
+}
+.accent {
+  color: var(--accent);
+}
+.lead {
+  margin-top: 0.75rem;
+  font-size: 15px;
+  line-height: 1.625;
+  color: var(--muted);
+}
+.fields {
+  margin-top: 2rem;
+}
+.fields > :not(:last-child) {
+  margin-bottom: 1rem;
+}
+.submit {
+  margin-top: 1.75rem;
+}
+
+.divider {
+  margin: 1.75rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  color: var(--faint);
+}
+.rule {
+  height: 1px;
+  flex: 1;
+  background: var(--line);
+}
+.wide {
+  width: 100%;
+}
+
+.switch {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--muted);
+}
+.switchLink {
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 4px;
+  transition: color 0.15s var(--ease), text-decoration-color 0.15s var(--ease);
+}
+.switchLink:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
+/* password strength */
+.bars {
+  display: flex;
+  gap: 0.375rem;
+}
+.bar {
+  height: 0.25rem;
+  flex: 1;
+  border-radius: 999px;
+  background: var(--surface-3);
+  transition: background-color 0.3s var(--ease);
+}
+.weak {
+  background: var(--accent);
+}
+.fair {
+  background: #d39a4a;
+}
+.good {
+  background: var(--sage);
+}
+.meta {
+  margin-top: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--muted);
+}
+.rule8 {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.met {
+  color: var(--sage);
+}
+.unmet {
+  color: var(--faint);
+}
+.level {
+  font-weight: 600;
+  color: var(--ink);
+}

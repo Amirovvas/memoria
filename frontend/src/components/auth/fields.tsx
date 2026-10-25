@@ -2,6 +2,8 @@
 
 import { AlertCircle, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react"
 import { useId, useState, type InputHTMLAttributes, type ReactNode } from "react"
+import { cx } from "@/src/lib/cx"
+import s from "./fields.module.css"
 
 type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "className">
 
@@ -17,36 +19,27 @@ export function Field({
   const described = error ? `${id}-error` : hint ? `${id}-hint` : undefined
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block pl-1 text-[13px] font-semibold text-ink">
+      <label htmlFor={id} className={s.label}>
         {label}
       </label>
-      <div className="relative">
-        <span
-          className={`pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 transition-colors [&>svg]:size-[18px] ${
-            error ? "text-accent" : "text-faint"
-          }`}
-        >
-          {icon}
-        </span>
+      <div className={s.control}>
+        <span className={cx(s.icon, error && s.iconError)}>{icon}</span>
         <input
           id={id}
           aria-invalid={error ? true : undefined}
           aria-describedby={described}
-          // 16px on phones keeps iOS Safari from zooming into the field
-          className={`input h-12 pl-11 text-base sm:text-[15px] ${trailing ? "pr-12" : ""} ${
-            error ? "border-accent focus:border-accent" : ""
-          }`}
+          className={cx("input", s.input, !!trailing && s.withTrailing, error && s.inputError)}
           {...input}
         />
-        {trailing ? <span className="absolute right-1.5 top-1/2 -translate-y-1/2">{trailing}</span> : null}
+        {trailing ? <span className={s.trailing}>{trailing}</span> : null}
       </div>
       {error ? (
-        <p id={`${id}-error`} className="animate-fade-in mt-1.5 flex items-center gap-1.5 pl-1 text-[13px] font-medium text-accent">
-          <AlertCircle size={14} className="shrink-0" />
+        <p id={`${id}-error`} className={`animate-fade-in ${s.error}`}>
+          <AlertCircle size={14} className={s.noShrink} />
           {error}
         </p>
       ) : hint ? (
-        <div id={`${id}-hint`} className="mt-1.5 pl-1">
+        <div id={`${id}-hint`} className={s.hint}>
           {hint}
         </div>
       ) : null}
@@ -63,7 +56,7 @@ export function PasswordField(props: Omit<Parameters<typeof Field>[0], "type" | 
       trailing={
         <button
           type="button"
-          className="icon-btn size-9 text-muted hover:text-ink"
+          className={`icon-btn ${s.toggle}`}
           onClick={() => setShown((v) => !v)}
           aria-label={shown ? "Скрыть пароль" : "Показать пароль"}
           aria-pressed={shown}
@@ -78,11 +71,8 @@ export function PasswordField(props: Omit<Parameters<typeof Field>[0], "type" | 
 export function FormError({ message }: { message: string | null }) {
   if (!message) return null
   return (
-    <div
-      role="alert"
-      className="animate-pop-in flex items-start gap-2.5 rounded-2xl border border-accent/25 bg-accent-soft px-4 py-3 text-sm font-medium text-ink"
-    >
-      <AlertCircle size={18} className="mt-px shrink-0 text-accent" />
+    <div role="alert" className={`animate-pop-in ${s.banner}`}>
+      <AlertCircle size={18} className={s.bannerIcon} />
       {message}
     </div>
   )
@@ -90,7 +80,7 @@ export function FormError({ message }: { message: string | null }) {
 
 export function SubmitButton({ pending, children, pendingLabel }: { pending: boolean; children: ReactNode; pendingLabel: string }) {
   return (
-    <button type="submit" className="btn btn-accent btn-lg group w-full" disabled={pending} aria-busy={pending}>
+    <button type="submit" className={`btn btn-accent btn-lg ${s.submit}`} disabled={pending} aria-busy={pending}>
       {pending ? (
         <>
           <Loader2 size={18} className="animate-spin" />
@@ -99,7 +89,7 @@ export function SubmitButton({ pending, children, pendingLabel }: { pending: boo
       ) : (
         <>
           {children}
-          <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
+          <ArrowRight size={18} className={s.arrow} />
         </>
       )}
     </button>

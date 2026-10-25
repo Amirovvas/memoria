@@ -1,0 +1,517 @@
+/* The surprise page keeps these warm colours in both themes. */
+.relative {
+  position: relative;
+}
+.terracotta {
+  color: #b4553a;
+}
+.eyebrow {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: #b07b66;
+}
+.script {
+  font-family: var(--font-script);
+  color: #b4553a;
+}
+.pressable {
+  transition: all 0.15s var(--ease);
+}
+.pressable:active {
+  scale: 0.97;
+}
+
+/* ---------- Backdrop ---------- */
+.backdrop {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+.paper {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(170deg, #fdf4ec 0%, #f9e6dc 48%, #f4dcd6 100%);
+}
+.glowWarm,
+.glowPink {
+  position: absolute;
+  border-radius: 999px;
+}
+.glowWarm {
+  left: -33.333%;
+  top: -25%;
+  width: 90vmax;
+  height: 90vmax;
+  background: rgb(255 217 199 / 0.6);
+  filter: blur(90px);
+}
+.glowPink {
+  bottom: -33.333%;
+  right: -33.333%;
+  width: 80vmax;
+  height: 80vmax;
+  background: rgb(246 196 207 / 0.45);
+  filter: blur(100px);
+}
+.driftItem {
+  color: #e79a8c;
+}
+
+/* ---------- Music ---------- */
+.music {
+  position: fixed;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  right: 1rem;
+  z-index: 40;
+  display: flex;
+  height: 3rem;
+  max-width: min(240px, 70vw);
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.75);
+  padding: 0 1rem 0 0.375rem;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.7), 0 12px 30px -14px rgb(90 40 25 / 0.55);
+  backdrop-filter: blur(12px);
+  transition: all 0.15s var(--ease);
+}
+.music:active {
+  scale: 0.95;
+}
+.musicIcon {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 999px;
+  background: #b4553a;
+  color: #fff;
+}
+.playIcon {
+  translate: 1px 0;
+}
+.equalizer {
+  display: flex;
+  height: 0.875rem;
+  align-items: flex-end;
+  gap: 2px;
+}
+.bar {
+  width: 3px;
+  border-radius: 999px;
+  background: #b4553a;
+}
+.barIdle {
+  height: 0.25rem;
+}
+.musicTitle {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ---------- Invitation ---------- */
+.invite {
+  position: relative;
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem 4rem;
+  text-align: center;
+}
+.giftIcon {
+  margin: 0 auto;
+  display: grid;
+  width: 6rem;
+  height: 6rem;
+  place-items: center;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.6);
+  font-size: 3rem;
+  line-height: 1;
+  box-shadow: 0 0 0 1px #fff, 0 20px 50px -20px rgb(180 85 58 / 0.6);
+  backdrop-filter: blur(8px);
+}
+.inviteEyebrow {
+  margin-top: 2.5rem;
+}
+.recipient {
+  margin-top: 1rem;
+  font-size: clamp(52px, 15vw, 88px);
+  line-height: 0.95;
+}
+.inviteLead {
+  margin: 1.25rem auto 0;
+  max-width: 280px;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-style: italic;
+  line-height: 1.375;
+  color: #7a5446;
+}
+.openButton {
+  margin-top: 3rem;
+  height: 4rem;
+  width: 100%;
+  max-width: 300px;
+  border-radius: 999px;
+  background: #b4553a;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 20px 40px -14px rgb(180 85 58 / 0.85);
+}
+.soundHint {
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: #9b7a6c;
+}
+
+/* ---------- Wishes ---------- */
+/* Space is reserved for the rest of the text, so nothing jumps while it types. */
+.typewriter {
+  position: relative;
+  cursor: default;
+  white-space: pre-line;
+  font-family: var(--font-serif);
+  font-size: clamp(25px, 6.6vw, 34px);
+  font-weight: 500;
+  line-height: 1.28;
+}
+.invisible {
+  visibility: hidden;
+}
+.wishes {
+  position: relative;
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  justify-content: center;
+  padding: 5rem 1.75rem;
+}
+.wishesInner {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 520px;
+}
+.message {
+  margin-top: 1.25rem;
+}
+.signature {
+  margin-top: 2rem;
+  text-align: right;
+  font-size: clamp(30px, 8vw, 40px);
+  translate: 0 0.75rem;
+  opacity: 0;
+  transition: all 1s var(--ease);
+}
+.scrollHint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #9b7a6c;
+  opacity: 0;
+  transition: opacity 1s var(--ease);
+}
+.shown {
+  translate: 0 0;
+  opacity: 1;
+}
+.scrollLabel {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+.bounce {
+  margin-top: 0.25rem;
+  animation: bounce 1s infinite;
+}
+
+/* ---------- Gallery ---------- */
+.gallery {
+  position: relative;
+  padding: 1rem 1.75rem 2.5rem;
+}
+.galleryList {
+  margin: 0 auto;
+  display: flex;
+  max-width: 460px;
+  flex-direction: column;
+  gap: 3.5rem;
+}
+.print {
+  display: block;
+  width: 100%;
+  border-radius: 3px;
+  background: #fffdf8;
+  padding: 4% 4% 13%;
+  text-align: left;
+  box-shadow: 0 30px 60px -28px rgb(90 40 25 / 0.55), 0 6px 16px -8px rgb(90 40 25 / 0.3);
+}
+.printImage {
+  display: block;
+  height: auto;
+  width: 100%;
+  background: #f1e7dc;
+}
+
+/* ---------- Lightbox ---------- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  background: rgb(27 20 17 / 0.95);
+  color: #fff;
+  backdrop-filter: blur(4px);
+}
+.lightboxTop {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  padding: max(12px, env(safe-area-inset-top)) 1rem 0.5rem;
+}
+.counter {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: rgb(255 255 255 / 0.7);
+}
+.closeButton {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.1);
+}
+.stage {
+  position: relative;
+  min-height: 0;
+  flex: 1;
+  touch-action: pan-y;
+  overflow: hidden;
+}
+.track {
+  display: flex;
+  height: 100%;
+}
+.slide {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.slideImage {
+  max-height: 100%;
+  max-width: 100%;
+  user-select: none;
+  border-radius: 3px;
+  object-fit: contain;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+}
+.arrow {
+  position: absolute;
+  top: 50%;
+  display: none;
+  width: 3rem;
+  height: 3rem;
+  translate: 0 -50%;
+  place-items: center;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.1);
+}
+.arrow:hover {
+  background: rgb(255 255 255 / 0.2);
+}
+.arrowLeft {
+  left: 0.75rem;
+}
+.arrowRight {
+  right: 0.75rem;
+}
+@media (min-width: 40rem) {
+  .slide {
+    padding: 2.5rem;
+  }
+  .arrow {
+    display: grid;
+  }
+}
+.dots {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.75rem 0 max(20px, env(safe-area-inset-bottom));
+}
+.dot {
+  height: 0.375rem;
+  width: 0.375rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.35);
+  transition: all 0.15s var(--ease);
+}
+.dotActive {
+  width: 1.5rem;
+  background: #fff;
+}
+
+/* ---------- Finale ---------- */
+.finale {
+  position: relative;
+  display: flex;
+  min-height: 80dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.75rem 8rem;
+  text-align: center;
+}
+.finaleTitle {
+  font-size: clamp(44px, 13vw, 72px);
+  line-height: 1.05;
+}
+.replay {
+  margin-top: 2.5rem;
+  display: inline-flex;
+  height: 3.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.8);
+  padding: 0 1.75rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+  box-shadow: 0 0 0 1px #fff, 0 16px 40px -18px rgb(120 60 40 / 0.6);
+  backdrop-filter: blur(8px);
+}
+.credits {
+  margin-top: 5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+.madeIn {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: #9b7a6c;
+}
+.brand {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 600;
+  font-style: italic;
+  color: #7a5446;
+}
+.makeOwn {
+  display: inline-flex;
+  height: 2.5rem;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #d9b8a8;
+  padding: 0 1.25rem;
+  font-size: 13px;
+  font-weight: 600;
+  color: #7a5446;
+  transition: background-color 0.15s var(--ease);
+}
+.makeOwn:hover {
+  background: rgb(255 255 255 / 0.6);
+}
+
+/* ---------- Page ---------- */
+.surprise {
+  position: relative;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+.openingStage {
+  display: flex;
+  min-height: 100dvh;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 2.5rem 0;
+}
+.notice {
+  position: relative;
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2rem;
+  text-align: center;
+}
+.emoji {
+  font-size: 3rem;
+  line-height: 1;
+}
+.noticeTitle {
+  margin-top: 1.5rem;
+  font-family: var(--font-serif);
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  font-weight: 500;
+}
+.noticeText {
+  margin: 0.75rem auto 0;
+  max-width: 20rem;
+  font-size: 15px;
+  line-height: 1.625;
+  color: #7a5446;
+}
+.noticeLink {
+  margin-top: 2rem;
+  display: inline-flex;
+  height: 3rem;
+  align-items: center;
+  border-radius: 999px;
+  background: #b4553a;
+  padding: 0 1.5rem;
+  font-weight: 600;
+  color: #fff;
+}
+.splash {
+  position: relative;
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+}

@@ -1,0 +1,65 @@
+.stack {
+  pointer-events: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 6rem;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+@media (min-width: 64rem) {
+  .stack {
+    bottom: 1.5rem;
+  }
+}
+.toast {
+  pointer-events: auto;
+  display: flex;
+  max-width: 28rem;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 999px;
+  background: var(--ink);
+  padding: 0.625rem 0.5rem 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--bg);
+  box-shadow: var(--shadow-float);
+}
+.badge {
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  place-items: center;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--bg) 15%, transparent);
+}
+.error {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.success {
+  background: var(--sage);
+  color: #fff;
+}
+.message {
+  padding-right: 0.25rem;
+}
+.close {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
+  border-radius: 999px;
+  opacity: 0.6;
+  cursor: pointer;
+}
+.close:hover {
+  background: color-mix(in oklab, var(--bg) 10%, transparent);
+  opacity: 1;
+}

@@ -8,6 +8,7 @@ import { useApp } from "../providers/AppProvider"
 import { Popover } from "../ui/Menu"
 import { useEditor } from "./context"
 import { CaptionAssistant } from "./panels"
+import s from "./ContextBar.module.css"
 
 function BarButton({ children, onClick, label, danger }: { children: ReactNode; onClick?: () => void; label?: string; danger?: boolean }) {
   return (
@@ -15,16 +16,14 @@ function BarButton({ children, onClick, label, danger }: { children: ReactNode; 
       onClick={onClick}
       aria-label={label}
       title={label}
-      className={`flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold transition-colors hover:bg-surface-2 ${
-        danger ? "text-accent" : "text-ink"
-      }`}
+      className={`${s.barButton} ${danger ? s.danger : ""}`}
     >
       {children}
     </button>
   )
 }
 
-const Divider = () => <span className="mx-0.5 h-5 w-px shrink-0 bg-line" />
+const Divider = () => <span className={s.divider} />
 
 function ColorPicker({ value, onChange, side }: { value: string; onChange: (c: string) => void; side: "top" | "bottom" }) {
   const { doc } = useEditor()
@@ -34,27 +33,27 @@ function ColorPicker({ value, onChange, side }: { value: string; onChange: (c: s
     <Popover
       side={side}
       align="center"
-      className="w-56 p-3"
+      className={s.colorMenu}
       trigger={({ toggle }) => (
-        <button onClick={toggle} className="grid size-9 shrink-0 place-items-center rounded-full hover:bg-surface-2" aria-label="Цвет" title="Цвет">
-          <span className="size-5 rounded-full ring-2 ring-surface outline outline-1 outline-line-strong" style={{ background: value }} />
+        <button onClick={toggle} className={s.colorTrigger} aria-label="Цвет" title="Цвет">
+          <span className={s.colorDot} style={{ background: value }} />
         </button>
       )}
     >
-      <p className="eyebrow mb-2">Цвет</p>
-      <div className="grid grid-cols-6 gap-2">
+      <p className={`eyebrow ${s.menuEyebrow}`}>Цвет</p>
+      <div className={s.swatches}>
         {colors.map((c) => (
           <button
             key={c}
             onClick={() => onChange(c)}
-            className={`aspect-square rounded-full ring-1 ring-black/10 transition hover:scale-110 ${value === c ? "outline-2 outline-offset-2 outline-accent" : ""}`}
+            className={`${s.swatch} ${value === c ? s.swatchActive : ""}`}
             style={{ background: c }}
             aria-label={c}
           />
         ))}
-        <label className="relative grid aspect-square cursor-pointer place-items-center rounded-full border border-dashed border-line-strong text-muted">
+        <label className={s.customColor}>
           <Plus size={12} />
-          <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="absolute inset-0 cursor-pointer opacity-0" />
+          <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className={s.colorInput} />
         </label>
       </div>
     </Popover>
@@ -68,13 +67,13 @@ function TextTools({ el, side }: { el: TextEl; side: "top" | "bottom" }) {
     <>
       <Popover
         side={side}
-        className="w-52"
+        className={s.fontMenu}
         trigger={({ toggle, open }) => (
-          <button onClick={toggle} className="flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold hover:bg-surface-2" aria-expanded={open}>
-            <span style={{ fontFamily: font.css }} className="max-w-24 truncate text-[15px] font-medium">
+          <button onClick={toggle} className={s.fontTrigger} aria-expanded={open}>
+            <span style={{ fontFamily: font.css }} className={s.fontName}>
               {font.label}
             </span>
-            <ChevronDown size={13} className="text-muted" />
+            <ChevronDown size={13} className={s.muted} />
           </button>
         )}
       >
@@ -86,10 +85,10 @@ function TextTools({ el, side }: { el: TextEl; side: "top" | "bottom" }) {
                 updateEl(el.id, { font: k })
                 close()
               }}
-              className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left hover:bg-surface-2 ${el.font === k ? "bg-surface-2" : ""}`}
+              className={`${s.fontOption} ${el.font === k ? s.fontActive : ""}`}
             >
               <span style={{ fontFamily: FONTS[k].css, fontSize: 18 * FONTS[k].scale + 2 }}>{FONTS[k].label}</span>
-              <span className="text-xs text-faint" style={{ fontFamily: FONTS[k].css }}>
+              <span className={s.fontSample} style={{ fontFamily: FONTS[k].css }}>
                 Аа
               </span>
             </button>
@@ -97,12 +96,12 @@ function TextTools({ el, side }: { el: TextEl; side: "top" | "bottom" }) {
         }
       </Popover>
       <Divider />
-      <div className="flex shrink-0 items-center">
-        <button className="icon-btn size-8" onClick={() => updateEl(el.id, { size: Math.max(1, +(el.size / 1.12).toFixed(2)) })} aria-label="Меньше">
+      <div className={s.size}>
+        <button className={`icon-btn ${s.sizeButton}`} onClick={() => updateEl(el.id, { size: Math.max(1, +(el.size / 1.12).toFixed(2)) })} aria-label="Меньше">
           <Minus size={15} />
         </button>
-        <span className="w-8 text-center text-[13px] font-semibold tabular-nums">{Math.round(el.size * 10)}</span>
-        <button className="icon-btn size-8" onClick={() => updateEl(el.id, { size: Math.min(30, +(el.size * 1.12).toFixed(2)) })} aria-label="Больше">
+        <span className={s.sizeValue}>{Math.round(el.size * 10)}</span>
+        <button className={`icon-btn ${s.sizeButton}`} onClick={() => updateEl(el.id, { size: Math.min(30, +(el.size * 1.12).toFixed(2)) })} aria-label="Больше">
           <Plus size={15} />
         </button>
       </div>
@@ -110,21 +109,21 @@ function TextTools({ el, side }: { el: TextEl; side: "top" | "bottom" }) {
       <ColorPicker value={el.color} onChange={(c) => updateEl(el.id, { color: c, colorToken: undefined })} side={side} />
       <Divider />
       <BarButton onClick={() => startEditing(el.id)} label="Изменить текст">
-        <PencilLine size={15} /> <span className="max-sm:hidden">Изменить</span>
+        <PencilLine size={15} /> <span className={s.label}>Изменить</span>
       </BarButton>
       <Popover
         side={side}
         align="right"
-        className="w-72 p-3"
+        className={s.wideMenu}
         trigger={({ toggle }) => (
           <BarButton onClick={toggle} label="AI-подписи">
-            <Sparkles size={15} className="text-accent" /> <span className="max-sm:hidden">AI</span>
+            <Sparkles size={15} className={s.accent} /> <span className={s.label}>AI</span>
           </BarButton>
         )}
       >
         {(close) => (
           <>
-            <p className="mb-2 text-sm font-semibold">Подписи от AI</p>
+            <p className={s.aiTitle}>Подписи от AI</p>
             <CaptionAssistant
               compact
               onPick={(t) => {
@@ -155,7 +154,7 @@ function ReplaceMenu({ slotId, hasPhoto, side }: { slotId: string; hasPhoto: boo
   return (
     <Popover
       side={side}
-      className="w-72 p-3"
+      className={s.wideMenu}
       trigger={({ toggle }) => (
         <BarButton onClick={toggle}>
           {hasPhoto ? <RefreshCw size={15} /> : <ImagePlus size={15} />} {hasPhoto ? "Заменить фото" : "Добавить фото"}
@@ -165,7 +164,7 @@ function ReplaceMenu({ slotId, hasPhoto, side }: { slotId: string; hasPhoto: boo
       {(close) => (
         <>
           <button
-            className="btn btn-sm btn-primary w-full"
+            className={`btn btn-sm btn-primary ${s.wide}`}
             onClick={() => {
               close()
               openFilePicker(slotId)
@@ -173,8 +172,8 @@ function ReplaceMenu({ slotId, hasPhoto, side }: { slotId: string; hasPhoto: boo
           >
             <Upload size={14} /> С устройства
           </button>
-          <p className="eyebrow mb-2 mt-4">Из загруженных</p>
-          <div className="grid max-h-52 grid-cols-4 gap-1.5 overflow-y-auto scrollbar-thin">
+          <p className={`eyebrow ${s.uploadsEyebrow}`}>Из загруженных</p>
+          <div className={`scrollbar-thin ${s.thumbs}`}>
             {uploads.map((u) => (
               <button
                 key={u.id}
@@ -182,15 +181,15 @@ function ReplaceMenu({ slotId, hasPhoto, side }: { slotId: string; hasPhoto: boo
                   placePhoto(slotId, u.src)
                   close()
                 }}
-                className="aspect-square overflow-hidden rounded-md ring-1 ring-line hover:ring-accent"
+                className={s.thumb}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={u.src} alt={u.name} className="h-full w-full object-cover" />
+                <img src={u.src} alt={u.name} className={s.cover} />
               </button>
             ))}
           </div>
           <button
-            className="mt-3 w-full text-xs font-semibold text-muted hover:text-ink"
+            className={s.allPhotos}
             onClick={() => {
               close()
               setTool("photos")
@@ -230,7 +229,7 @@ export function ContextBar({ side = "bottom" }: { side?: "top" | "bottom" }) {
   } else {
     tools = (
       <>
-        <span className="px-2 text-[13px] font-semibold text-muted">Декор</span>
+        <span className={s.decorLabel}>Декор</span>
         <ColorPicker value={selected.color} onChange={(c) => updateEl(selected.id, { color: c, colorToken: undefined })} side={side} />
         <Divider />
         <BarButton onClick={() => removeEl(selected.id)} danger>
@@ -242,12 +241,12 @@ export function ContextBar({ side = "bottom" }: { side?: "top" | "bottom" }) {
 
   return (
     <div
-      className="animate-pop-in flex max-w-full items-center gap-0.5 rounded-[22px] border border-line bg-surface p-1 shadow-card"
+      className={`animate-pop-in ${s.bar}`}
       onPointerDown={(e) => e.stopPropagation()}
     >
-      <div className="flex min-w-0 flex-wrap items-center justify-center gap-0.5">{tools}</div>
+      <div className={s.tools}>{tools}</div>
       <Divider />
-      <button className="icon-btn size-9 text-muted" onClick={() => select(null)} aria-label="Снять выделение">
+      <button className={`icon-btn ${s.close}`} onClick={() => select(null)} aria-label="Снять выделение">
         <X size={16} />
       </button>
     </div>

@@ -4,10 +4,12 @@ import { Check, Lock, Mail, User } from "lucide-react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
-import { useRegister, useUser } from "@/src/hooks/useAuth"
+import { useRegister } from "@/src/hooks/useRegister"
+import { useUser } from "@/src/hooks/useUser"
 import { ApiError } from "@/src/lib/api"
 import { useApp } from "../providers/AppProvider"
 import { Field, FormError, PasswordField, SubmitButton, safeNext } from "./fields"
+import s from "./form.module.css"
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -30,10 +32,10 @@ function validate({ name, email, password }: Values) {
 }
 
 const LEVELS = [
-  { label: "Слабый", color: "bg-accent" },
-  { label: "Неплохой", color: "bg-[#d39a4a]" },
-  { label: "Хороший", color: "bg-sage" },
-  { label: "Отличный", color: "bg-sage" },
+  { label: "Слабый", color: s.weak },
+  { label: "Неплохой", color: s.fair },
+  { label: "Хороший", color: s.good },
+  { label: "Отличный", color: s.good },
 ]
 
 function strength(p: string) {
@@ -51,20 +53,17 @@ function StrengthMeter({ password }: { password: string }) {
   const level = LEVELS[score - 1]
   return (
     <div aria-live="polite">
-      <div className="flex gap-1.5">
+      <div className={s.bars}>
         {LEVELS.map((_, i) => (
-          <span
-            key={i}
-            className={`h-1 flex-1 rounded-full transition-colors duration-300 ${i < score && level ? level.color : "bg-surface-3"}`}
-          />
+          <span key={i} className={`${s.bar} ${i < score && level ? level.color : ""}`} />
         ))}
       </div>
-      <p className="mt-1.5 flex items-center justify-between text-xs text-muted">
-        <span className="flex items-center gap-1">
-          <Check size={13} className={password.length >= 8 ? "text-sage" : "text-faint"} />
+      <p className={s.meta}>
+        <span className={s.rule8}>
+          <Check size={13} className={password.length >= 8 ? s.met : s.unmet} />
           Не короче 8 символов
         </span>
-        {password && level ? <span className="font-semibold text-ink">{level.label}</span> : null}
+        {password && level ? <span className={s.level}>{level.label}</span> : null}
       </p>
     </div>
   )
@@ -105,12 +104,12 @@ export function RegisterForm() {
       }}
     >
       <p className="eyebrow">Новый аккаунт</p>
-      <h1 className="display mt-3 text-[44px] sm:text-[52px]">
-        Начните свою <em className="text-accent">историю</em>
+      <h1 className={`display ${s.title}`}>
+        Начните свою <em className={s.accent}>историю</em>
       </h1>
-      <p className="mt-3 text-[15px] leading-relaxed text-muted">Сохраняйте коллажи, собирайте избранное и возвращайтесь к ним с любого устройства.</p>
+      <p className={s.lead}>Сохраняйте коллажи, собирайте избранное и возвращайтесь к ним с любого устройства.</p>
 
-      <div className="mt-8 space-y-4">
+      <div className={s.fields}>
         <FormError message={bannerError} />
         <Field
           label="Имя"
@@ -156,18 +155,15 @@ export function RegisterForm() {
         />
       </div>
 
-      <div className="mt-7">
+      <div className={s.submit}>
         <SubmitButton pending={register.isPending || register.isSuccess} pendingLabel="Создаём аккаунт…">
           Создать аккаунт
         </SubmitButton>
       </div>
 
-      <p className="mt-6 text-center text-sm text-muted">
+      <p className={s.switch}>
         Уже есть аккаунт?{" "}
-        <Link
-          href={next === "/" ? "/login" : `/login?next=${encodeURIComponent(next)}`}
-          className="font-semibold text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
-        >
+        <Link href={next === "/" ? "/login" : `/login?next=${encodeURIComponent(next)}`} className={s.switchLink}>
           Войти
         </Link>
       </p>

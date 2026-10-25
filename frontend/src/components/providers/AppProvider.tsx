@@ -2,7 +2,7 @@
 
 import { useQuery, useQueryClient, type QueryKey } from "@tanstack/react-query"
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react"
-import { useUser } from "@/src/hooks/useAuth"
+import { useUser } from "@/src/hooks/useUser"
 import { libraryApi, type ServerPhoto, type ServerProject } from "@/src/lib/api"
 import { uid } from "@/src/lib/collage/build"
 import type { CollageDoc } from "@/src/lib/collage/types"
@@ -40,7 +40,6 @@ export interface Settings {
   autosave: boolean
   defaultFormat: "png" | "jpg" | "pdf"
   showGuides: boolean
-  emailDigest: boolean
 }
 
 /** Interface preferences only; collages, favourites and photos live on the server. */
@@ -85,7 +84,7 @@ const PREFS_KEY = "memoria:prefs"
 const LEGACY_KEY = "memoria:v2"
 const THEME_KEY = "memoria:theme"
 
-const DEFAULT_SETTINGS: Settings = { autosave: true, defaultFormat: "png", showGuides: true, emailDigest: false }
+const DEFAULT_SETTINGS: Settings = { autosave: true, defaultFormat: "png", showGuides: true }
 const DEFAULT_PREFS: Prefs = { sidebarCollapsed: false, settings: DEFAULT_SETTINGS }
 
 const toUpload = (p: ServerPhoto): Upload => ({ id: p.id, src: p.url, name: p.name })

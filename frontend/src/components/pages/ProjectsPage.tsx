@@ -8,6 +8,8 @@ import { ProjectCard } from "../projects/ProjectCard"
 import { useApp } from "../providers/AppProvider"
 import { EmptyArt, EmptyState, plural } from "../ui/bits"
 import { SelectChip } from "../ui/Menu"
+import page from "./page.module.css"
+import s from "./ProjectsPage.module.css"
 
 type Sort = "updated" | "created" | "name"
 
@@ -28,12 +30,12 @@ export function ProjectsPage() {
   }, [activeProjects, q, type, sort])
 
   return (
-    <div className="mx-auto max-w-[1600px] px-4 pt-4 sm:px-6 lg:px-10">
-      <header className="flex flex-wrap items-end justify-between gap-4 pb-6 pt-4">
+    <div className={page.page}>
+      <header className={page.header}>
         <div>
           <p className="eyebrow">Библиотека</p>
-          <h1 className="display mt-2 text-5xl sm:text-6xl">Мои проекты</h1>
-          <p className="mt-2 text-[15px] text-muted">
+          <h1 className={`display ${page.title}`}>Мои проекты</h1>
+          <p className={page.lead}>
             {activeProjects.length} {plural(activeProjects.length, "коллаж", "коллажа", "коллажей")} · автосохранение включено
           </p>
         </div>
@@ -42,20 +44,19 @@ export function ProjectsPage() {
         </Link>
       </header>
 
-      <div className="sticky top-16 z-20 -mx-4 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 md:top-[72px] lg:-mx-10 lg:px-10">
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative w-full sm:w-72">
-            <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-faint" />
+      <div className={page.toolbar}>
+        <div className={page.toolbarRow}>
+          <div className={s.search}>
+            <Search size={16} className={page.searchIcon} />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Поиск по названию"
-              className="input pl-10"
+              className={`input ${page.searchInput}`}
               aria-label="Поиск по названию"
             />
           </div>
-          {/* own full-bleed row on phones, so the sort chip never covers it */}
-          <div className="-mx-4 flex w-[calc(100%+2rem)] scroll-px-4 gap-2 overflow-x-auto px-4 scrollbar-none sm:mx-0 sm:w-auto sm:flex-1 sm:px-0">
+          <div className={`scrollbar-none ${s.types}`}>
             <button className="chip" data-active={!type ? "true" : undefined} onClick={() => setType(null)}>
               Все
             </button>
@@ -108,7 +109,7 @@ export function ProjectsPage() {
           }
         />
       ) : (
-        <div className="grid grid-cols-2 gap-x-4 gap-y-8 pt-6 sm:gap-x-6 @3xl:grid-cols-3 @5xl:grid-cols-4 @7xl:grid-cols-5">
+        <div className={`${page.grid} ${s.list}`}>
           {list.map((p) => (
             <ProjectCard key={p.id} project={p} />
           ))}
@@ -116,9 +117,9 @@ export function ProjectsPage() {
       )}
 
       {trashedProjects.length ? (
-        <p className="mt-12 text-center text-sm text-muted">
+        <p className={page.footnote}>
           В корзине {trashedProjects.length} {plural(trashedProjects.length, "проект", "проекта", "проектов")} ·{" "}
-          <Link href="/trash" className="font-semibold text-ink hover:text-accent">
+          <Link href="/trash" className={page.link}>
             Открыть корзину
           </Link>
         </p>
