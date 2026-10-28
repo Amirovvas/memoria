@@ -29,11 +29,11 @@ import {
   type DragEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react"
-import { addToTray, anchorFrames, autoPlace, emptySlotCount, framesLocked, trayPhotos, withPhoto } from "@/src/lib/collage/build"
+import { addToTray, anchorFrames, autoPlace, emptySlotCount, framesLocked, photoEls, trayPhotos, withPhoto } from "@/src/lib/collage/build"
 import { DECOS, FORMATS } from "@/src/lib/collage/styles"
 import type { CollageDoc, CollageEl, PhotoEl, TextEl } from "@/src/lib/collage/types"
 import { TEMPLATE_BY_ID } from "@/src/lib/catalog"
-import { cropOf, isSamplePhoto } from "@/src/lib/photos"
+import { cropOf, isSamplePhoto, isUserPhoto } from "@/src/lib/photos"
 import { CollageCanvas } from "../collage/CollageCanvas"
 import { useApp, type Project } from "../providers/AppProvider"
 import { useMedia } from "../ui/bits"
@@ -51,6 +51,7 @@ const TOOLS: { key: Tool; label: string; title: string; icon: typeof Images }[] 
 ]
 
 const ZOOMS = [0.5, 0.75, 1, 1.25, 1.5, 2, 2.5]
+const PAN_TIP_KEY = "memoria:pan-tip"
 
 function patchEl(d: CollageDoc, id: string, patch: Partial<CollageEl>): CollageDoc {
   return { ...d, elements: d.elements.map((e) => (e.id === id ? ({ ...e, ...patch } as CollageEl) : e)) }
@@ -157,6 +158,8 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
   const selected = useMemo(() => doc.elements.find((e) => e.id === selectedId) ?? null, [doc, selectedId])
   const empty = emptySlotCount(doc)
   const locked = framesLocked(doc)
+  // a fresh template shows sample photos: until the first upload, the bottom hint says what to do
+  const mine = photoEls(doc).filter((p) => isUserPhoto(p.src)).length
 
   /* ---------- lifecycle ---------- */
 
@@ -203,6 +206,17 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
     const anchored = anchorFrames(doc)
     if (anchored !== doc) live(() => anchored)
   }, [doc, locked, live])
+
+  useEffect(() => {
+    if (!mobile || selected?.kind !== "photo" || !selected.src || cropOf(selected.src)) return
+    try {
+      if (localStorage.getItem(PAN_TIP_KEY)) return
+      localStorage.setItem(PAN_TIP_KEY, "1")
+    } catch {
+      return
+    }
+    toast("Тяните фото пальцем — так выбирается нужная часть кадра")
+  }, [mobile, selected, toast])
 
   /* ---------- editing API ---------- */
 
@@ -502,8 +516,10 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
 
   // vertical room keeps the zoom bar clear; the side margin shrinks with the area, so a narrow tablet canvas stays big
   const padY = mobile ? 28 : 136
+  // on a phone the tools of the selected element float over the bottom: the collage moves up out of their way
+  const barRoom = mobile && selected && !tool ? 76 : 0
   const padX = mobile ? 28 : Math.min(136, Math.max(48, area.w * 0.14))
-  const fitW = Math.max(160, Math.min(area.w - padX, (area.h - padY) * ratio))
+  const fitW = Math.max(160, Math.min(area.w - padX, (area.h - padY - barRoom) * ratio))
   const canvasW = Math.round(fitW * zoom)
   const zoomIdx = ZOOMS.indexOf(zoom)
   const activeTool = TOOLS.find((t) => t.key === tool)
@@ -616,7 +632,7 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
             >
               <div
                 className={s.stage}
-                style={{ padding: `${padY / 2}px ${padX / 2}px`, minWidth: canvasW + padX, width: "100%" }}
+                style={{ padding: `${padY / 2}px ${padX / 2}px ${padY / 2 + barRoom}px`, minWidth: canvasW + padX, width: "100%" }}
               >
                 <div className={s.canvasBox} style={{ width: canvasW }}>
                   <CollageCanvas
@@ -664,12 +680,20 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
             {/* bottom: empty-slot hint and zoom */}
             <div className={s.bottomBar}>
               <div className={s.minW0}>
-                {empty && !selected ? (
+                {(empty || !mine) && !selected ? (
                   <div className={`animate-fade-up ${s.hint}`}>
                     <span className={`animate-pulse ${s.hintDot}`} />
                     <span className={s.truncate}>
-                      Осталось заполнить: <b>{empty}</b>
-                      <span className={s.hintMuted}> — нажмите на пустую рамку</span>
+                      {empty ? (
+                        <>
+                          Осталось заполнить: <b>{empty}</b>
+                          <span className={s.hintMuted}> — нажмите на пустую рамку</span>
+                        </>
+                      ) : (
+                        <>
+                          Это примеры — <b>добавьте свои фото</b>
+                        </>
+                      )}
                     </span>
                     <button className={`btn btn-sm btn-primary ${s.upload}`} onClick={() => openFilePicker()}>
                       <Upload size={14} /> <span className={s.uploadLabel}>Загрузить</span>

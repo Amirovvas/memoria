@@ -169,7 +169,8 @@ function ReplaceMenu({ slotId, hasPhoto, side }: { slotId: string; hasPhoto: boo
   if (!tray.length) {
     return (
       <BarButton onClick={() => openFilePicker(slotId)}>
-        {hasPhoto ? <RefreshCw size={15} /> : <ImagePlus size={15} />} {hasPhoto ? "Заменить фото" : "Добавить фото"}
+        {hasPhoto ? <RefreshCw size={15} /> : <ImagePlus size={15} />}{" "}
+        {hasPhoto ? <><span className={s.long}>Заменить фото</span><span className={s.short}>Заменить</span></> : <><span className={s.long}>Добавить фото</span><span className={s.short}>Добавить</span></>}
       </BarButton>
     )
   }
@@ -179,7 +180,8 @@ function ReplaceMenu({ slotId, hasPhoto, side }: { slotId: string; hasPhoto: boo
       className={s.wideMenu}
       trigger={({ toggle }) => (
         <BarButton onClick={toggle}>
-          {hasPhoto ? <RefreshCw size={15} /> : <ImagePlus size={15} />} {hasPhoto ? "Заменить фото" : "Добавить фото"}
+          {hasPhoto ? <RefreshCw size={15} /> : <ImagePlus size={15} />}{" "}
+        {hasPhoto ? <><span className={s.long}>Заменить фото</span><span className={s.short}>Заменить</span></> : <><span className={s.long}>Добавить фото</span><span className={s.short}>Добавить</span></>}
         </BarButton>
       )}
     >
@@ -244,14 +246,14 @@ export function ContextBar({ side = "bottom" }: { side?: "top" | "bottom" }) {
           <>
             <Divider />
             <BarButton onClick={() => updateEl(selected.id, withPhoto(selected, null))} danger>
-              <Trash2 size={15} /> Удалить фото
+              <Trash2 size={15} /> <span className={s.long}>Удалить фото</span><span className={s.short}>Удалить</span>
             </BarButton>
           </>
         ) : !framesLocked(doc) ? (
           <>
             <Divider />
             <BarButton onClick={() => removeEl(selected.id)} danger>
-              <Trash2 size={15} /> Убрать рамку
+              <Trash2 size={15} /> <span className={s.long}>Убрать рамку</span><span className={s.short}>Убрать</span>
             </BarButton>
           </>
         ) : null}

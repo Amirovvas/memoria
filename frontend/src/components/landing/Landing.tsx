@@ -29,6 +29,9 @@ const GIFT_POINTS = [
   "Получателю не нужен аккаунт — достаточно навести камеру",
 ]
 
+/** Three real prints under the first words, so the first screen shows what the site makes. */
+const HERO_PRINTS: PhotoKey[] = ["friendsSunset", "positano", "heartsBokeh"]
+
 const MOMENTS: { key: PhotoKey; label: string }[] = [
   { key: "positano", label: "Путешествия" },
   { key: "heartsBokeh", label: "Любовь" },
@@ -98,6 +101,25 @@ export function Landing() {
             Memoria собирает ваши снимки в коллажи для печати и в подарки-сюрпризы: QR-код в открытке открывает страницу с
             вашими фото, словами и музыкой.
           </p>
+          <div className={s.heroActions}>
+            <Link href="/register" className={`btn btn-lg btn-accent ${s.heroCta}`}>
+              Создать коллаж <ArrowRight size={18} />
+            </Link>
+            <p className={s.heroNote}>
+              Бесплатно · уже есть аккаунт?{" "}
+              <Link href="/login" className={s.heroLink}>
+                Войти
+              </Link>
+            </p>
+          </div>
+          <div className={s.prints} aria-hidden>
+            {HERO_PRINTS.map((key, i) => (
+              <span key={key} className={`${s.print} ${[s.print0, s.print1, s.print2][i]}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photo(key, 600)} alt="" decoding="async" className={s.printPhoto} />
+              </span>
+            ))}
+          </div>
         </section>
 
         <section id="how" className={s.section}>
@@ -179,10 +201,6 @@ export function Landing() {
         <div className={s.footerInner}>
           <Logo href="#top" />
           <p className={s.footerText}>Коллажи с историей · 2026</p>
-          <div className={s.footerLinks}>
-            <Link href="/login">Войти</Link>
-            <Link href="/register">Регистрация</Link>
-          </div>
         </div>
       </footer>
     </div>

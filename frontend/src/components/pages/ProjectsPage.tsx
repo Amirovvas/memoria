@@ -41,16 +41,9 @@ export function ProjectsPage() {
             {activeProjects.length} {plural(activeProjects.length, "коллаж", "коллажа", "коллажей")} · автосохранение включено
           </p>
         </div>
-        <div className={s.headerActions}>
-          {activeProjects.length ? (
-            <button className={`btn btn-lg btn-ghost ${s.trashAll}`} onClick={() => setConfirmAll(true)}>
-              <Trash2 size={18} /> Удалить все
-            </button>
-          ) : null}
-          <Link href="/templates" className="btn btn-lg btn-secondary">
-            <LayoutTemplate size={18} /> Шаблоны
-          </Link>
-        </div>
+        <Link href="/templates" className="btn btn-lg btn-secondary">
+          <LayoutTemplate size={18} /> Шаблоны
+        </Link>
       </header>
 
       <Modal open={confirmAll} onClose={() => setConfirmAll(false)} label="Удалить все проекты" className={s.dialog}>
@@ -149,6 +142,15 @@ export function ProjectsPage() {
           ))}
         </div>
       )}
+
+      {/* out of the way at the end of the list, so a stray tap at the top cannot start it */}
+      {activeProjects.length > 1 ? (
+        <div className={s.trashAllRow}>
+          <button className={s.trashAll} onClick={() => setConfirmAll(true)}>
+            <Trash2 size={14} /> Удалить все проекты
+          </button>
+        </div>
+      ) : null}
 
       {trashedProjects.length ? (
         <p className={page.footnote}>

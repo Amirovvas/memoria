@@ -418,18 +418,67 @@
   font-size: 0.8125rem;
   color: var(--muted);
 }
-.footerLinks {
-  margin-left: auto;
-  display: flex;
-  gap: 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-.footerLinks a:hover {
-  color: var(--accent);
-}
 @media (min-width: 40rem) {
   .footerInner {
     padding: 2rem;
   }
+}
+
+/* ---------- Hero: call to action and three prints ---------- */
+.heroActions {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+}
+.heroCta {
+  gap: 0.5rem;
+}
+.heroNote {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.heroLink {
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prints {
+  position: relative;
+  margin: 3rem auto 0;
+  /* as tall as the tilted prints, with no empty band under them */
+  aspect-ratio: 100 / 74;
+  max-width: 34rem;
+}
+.print {
+  position: absolute;
+  top: 0;
+  width: 46%;
+  background: #fffdf8;
+  padding: 3% 3% 11%;
+  border-radius: 3px;
+  box-shadow: 0 24px 44px -20px rgb(60 35 20 / 0.45), 0 4px 10px -4px rgb(60 35 20 / 0.2);
+}
+.printPhoto {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+.print0 {
+  left: 2%;
+  top: 8%;
+  rotate: -7deg;
+}
+.print1 {
+  left: 27%;
+  z-index: 2;
+  rotate: 2deg;
+}
+.print2 {
+  right: 2%;
+  top: 10%;
+  rotate: 8deg;
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowLeft, ArrowRight, Check, Gift as GiftIcon, GripVertical, Loader2, Music, Pause, Play, Sparkles, Upload, VolumeX, X } from "lucide-react"
+import { ArrowLeft, ArrowRight, Check, ChevronDown, Gift as GiftIcon, GripVertical, Loader2, Music, Pause, Play, Sparkles, Upload, VolumeX, X } from "lucide-react"
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react"
 import { createPortal } from "react-dom"
 import { useUser } from "@/src/hooks/useUser"
@@ -12,6 +12,7 @@ import {
   OCCASION_TRACK,
   OCCASIONS,
   OPENINGS,
+  TRACK_BY_ID,
   TRACKS,
   suggestWishes,
   type Game,
@@ -284,6 +285,13 @@ function SurpriseStep({
   const [playing, setPlaying] = useState<string | null>(null)
   const own = music && "file" in music ? music.file : null
   const suggested = OCCASION_TRACK[occasion]
+  // a short list that always starts with the track already chosen, so the choice is in sight;
+  // the rest opens on request instead of scrolling inside the scrolling dialog
+  const [allTracks, setAllTracks] = useState(false)
+  const [lead] = useState(() => (music && "track" in music ? music.track : null))
+  const shownTracks = allTracks
+    ? TRACKS
+    : [...(lead && TRACK_BY_ID[lead] ? [TRACK_BY_ID[lead]] : []), ...TRACKS.filter((t) => t.id !== lead).slice(0, 5)]
   const ownSrc = useMemo(() => (own ? URL.createObjectURL(own) : null), [own])
 
   useEffect(() => () => audio.current?.pause(), [])
@@ -360,14 +368,15 @@ function SurpriseStep({
             </button>
           ))}
         </div>
+        <p className={s.gameNote}>{GAMES.find((g) => g.id === game)?.text}</p>
       </div>
 
       <div>
         <h3 className={`display ${s.title}`}>Музыка</h3>
         <p className={s.sub}>Включится, когда друг нажмёт «Открыть», и будет играть по кругу.</p>
         <div className={s.tracks}>
-          <div className={`scrollbar-thin ${s.trackList}`}>
-            {TRACKS.map((t) => {
+          <div className={s.trackList}>
+            {shownTracks.map((t) => {
               const active = !!music && "track" in music && music.track === t.id
               return (
                 <div key={t.id} className={row(active)}>
@@ -387,6 +396,11 @@ function SurpriseStep({
                 </div>
               )
             })}
+            {!allTracks ? (
+              <button className={s.moreTracks} onClick={() => setAllTracks(true)}>
+                <ChevronDown size={16} /> Показать все песни · {TRACKS.length}
+              </button>
+            ) : null}
           </div>
 
           <div className={row(!!own)}>

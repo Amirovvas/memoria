@@ -4,7 +4,9 @@
 .layout {
   display: grid;
 }
+/* on a phone the preview stays small, so the format and the download button are on the first screen */
 .previewPane {
+  --preview-h: 30dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -261,6 +263,23 @@
 @media (width < 48rem) {
   .giftCta {
     margin-top: 1.5rem;
+  }
+}
+@media (width < 48rem) {
+  .previewPane {
+    padding: 1rem;
+  }
+  /* the download button rides along the bottom while the options scroll */
+  .cta {
+    position: sticky;
+    bottom: 0.75rem;
+    z-index: 2;
+    box-shadow: 0 12px 30px -10px rgb(0 0 0 / 0.35);
+  }
+}
+@media (min-width: 48rem) {
+  .previewPane {
+    --preview-h: 56dvh;
   }
 }
 @media (min-width: 40rem) {

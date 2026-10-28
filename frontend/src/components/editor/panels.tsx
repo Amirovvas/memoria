@@ -7,7 +7,7 @@ import { applyLayout, buildDoc, emptySlotCount, newTextEl, photoEls, restyle, te
 import { LAYOUTS, LAYOUT_KEYS } from "@/src/lib/collage/layouts"
 import { BACKGROUND_SWATCHES, DECOS, FORMATS, PALETTES, PATTERNS, STYLES, resolveColor } from "@/src/lib/collage/styles"
 import type { CollageDoc, DecoEl, DecoKey, PaletteKey, PatternKey, StyleKey, TextEl, TextRole } from "@/src/lib/collage/types"
-import { cropOf } from "@/src/lib/photos"
+import { cropOf, isUserPhoto } from "@/src/lib/photos"
 import { CollageCanvas } from "../collage/CollageCanvas"
 import { DecoArt } from "../collage/Deco"
 import { useApp } from "../providers/AppProvider"
@@ -55,7 +55,8 @@ export function TemplatesPanel() {
 
   return (
     <>
-      <Group title="Композиция с вашими фото">
+      <Group title="Другие композиции">
+        <p className={s.layoutsNote}>Ваши фото и подписи перейдут в выбранную.</p>
         <div className={s.thumbs}>
           {layouts.map(({ key, doc: d }) => (
             <button
@@ -97,7 +98,9 @@ export function PhotosPanel() {
   const [demoLoading, setDemoLoading] = useState(false)
   const slots = photoEls(doc)
   const empty = emptySlotCount(doc)
-  const filled = slots.length - empty
+  // sample photos of the template are not the user's: only their own uploads count as filled
+  const mine = slots.filter((slot) => isUserPhoto(slot.src)).length
+  const sample = slots.length - mine - empty
   const used = new Set(slots.map((slot) => slot.src))
   const target = selected?.kind === "photo" ? selected : null
   // only the photos brought into this collage; other collages keep theirs to themselves
@@ -121,7 +124,9 @@ export function PhotosPanel() {
           <Upload size={19} />
         </span>
         <span className={s.dropTitle}>Загрузить фото</span>
-        <span className={cx(s.small, s.muted)}>или перетащите файлы сюда · JPG, PNG, HEIC</span>
+        <span className={cx(s.small, s.muted)}>
+          <span className={s.dragHint}>или перетащите файлы сюда · </span>JPG, PNG, HEIC
+        </span>
       </button>
       <button
         className={`btn btn-sm btn-ghost ${s.demo}`}
@@ -140,15 +145,24 @@ export function PhotosPanel() {
       <div className={s.progress}>
         <div className={s.progressHead}>
           <span className={s.bold}>
-            Заполнено {filled} из {slots.length}
+            Ваших фото: {mine} из {slots.length}
           </span>
-          {empty ? <span className={cx(s.small, s.accent)}>ещё {empty}</span> : <span className={cx(s.small, s.done)}>готово ✓</span>}
+          {mine < slots.length ? (
+            <span className={cx(s.small, s.accent)}>ещё {slots.length - mine}</span>
+          ) : (
+            <span className={cx(s.small, s.done)}>готово ✓</span>
+          )}
         </div>
         <div className={s.bars}>
           {slots.map((slot) => (
-            <span key={slot.id} className={cx(s.bar, slot.src && s.barFilled)} />
+            <span key={slot.id} className={cx(s.bar, isUserPhoto(slot.src) && s.barFilled)} />
           ))}
         </div>
+        {sample ? (
+          <p className={s.sampleNote}>
+            {mine ? "В остальных рамках пока примеры из шаблона" : "Сейчас в рамках примеры из шаблона"} — замените их своими снимками.
+          </p>
+        ) : null}
         <button className={`btn btn-sm btn-primary ${s.autofill}`} disabled={!tray.length} onClick={() => autoFill()}>
           <Wand2 size={14} /> Разместить автоматически
         </button>

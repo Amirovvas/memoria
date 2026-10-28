@@ -89,7 +89,7 @@ export function ExportDialog({
             {/* The preview keeps the chosen output proportions, so the user sees margins before downloading. */}
             <div
               className={s.previewFrame}
-              style={{ aspectRatio: `${w} / ${h}`, maxWidth: `min(100%, calc(56dvh * ${w / h}))`, background: doc.bg }}
+              style={{ aspectRatio: `${w} / ${h}`, maxWidth: `min(100%, calc(var(--preview-h) * ${w / h}))`, background: doc.bg }}
             >
               <div style={{ width: ratio >= w / h ? "100%" : `${(ratio / (w / h)) * 100}%` }}>
                 <CollageCanvas ref={nodeRef} doc={doc} imgWidth={1600} />

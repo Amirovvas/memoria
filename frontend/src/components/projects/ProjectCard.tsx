@@ -64,7 +64,7 @@ export function ProjectCard({ project: p, compact }: { project: Project; compact
         <div className={s.collage}>
           <CollageCanvas doc={p.doc} imgWidth={compact ? 320 : 420} className={s.canvas} />
         </div>
-        {empty ? <span className={s.draft}>Черновик · {empty} пуст.</span> : null}
+        {empty ? <span className={s.draft}>Пустых рамок: {empty}</span> : null}
         <span className={s.cta}>
           <span className={`btn btn-sm ${s.ctaButton}`}>
             <PenLine size={14} /> Продолжить

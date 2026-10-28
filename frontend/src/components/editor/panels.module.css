@@ -528,3 +528,22 @@
   line-height: 1rem;
   color: var(--muted);
 }
+
+.sampleNote {
+  margin-top: 0.625rem;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+/* nothing to drag on a phone */
+@media (hover: none), (width < 40rem) {
+  .dragHint {
+    display: none;
+  }
+}
+
+.layoutsNote {
+  margin: -0.25rem 0 0.75rem;
+  font-size: 12px;
+  color: var(--muted);
+}

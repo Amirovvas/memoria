@@ -198,6 +198,8 @@ function BottomNav() {
     { href: "/", label: "Главная", icon: House },
     { href: "/templates", label: "Шаблоны", icon: LayoutTemplate },
     { href: "/projects", label: "Проекты", icon: FolderHeart },
+    // the QR gift is what people come for, so it is one tap away on a phone too
+    { href: "/gifts", label: "Подарки", icon: Gift },
     { href: "/favorites", label: "Избранное", icon: Heart },
   ]
   return (

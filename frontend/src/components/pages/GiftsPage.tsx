@@ -8,7 +8,7 @@ import { OCCASION_BY_ID, OPENINGS, type Gift } from "@/src/lib/gifts"
 import { GiftShare } from "../gift/GiftShare"
 import { GiftWizard } from "../gift/GiftWizard"
 import { useApp } from "../providers/AppProvider"
-import { EmptyArt, EmptyState, TimeAgo } from "../ui/bits"
+import { EmptyArt, EmptyState, TimeAgo, plural } from "../ui/bits"
 import { Modal } from "../ui/Modal"
 import page from "./page.module.css"
 import s from "./GiftsPage.module.css"
@@ -39,7 +39,7 @@ function GiftCard({ gift, onShare, onDelete }: { gift: Gift; onShare: () => void
           <h3 className={s.name}>{gift.recipient}</h3>
           <p className={s.sub}>
             {opening ? <opening.icon size={13} strokeWidth={2} className={s.subIcon} /> : null}
-            {gift.collages.length} колл. · <TimeAgo ts={gift.createdAt} />
+            {gift.collages.length} {plural(gift.collages.length, "коллаж", "коллажа", "коллажей")} · <TimeAgo ts={gift.createdAt} />
           </p>
         </div>
         <a className={`icon-btn ${s.action}`} href={`/g/${gift.id}`} target="_blank" rel="noreferrer" aria-label="Открыть страницу" title="Открыть страницу">

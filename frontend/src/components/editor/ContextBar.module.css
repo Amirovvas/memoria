@@ -35,9 +35,20 @@
   flex-shrink: 0;
   background: var(--line);
 }
+.short {
+  display: none;
+}
 @media (width < 40rem) {
-  .label {
+  .label,
+  .long {
     display: none;
+  }
+  /* short words keep the photo tools on one line of a phone */
+  .short {
+    display: inline;
+  }
+  .tools {
+    flex-wrap: nowrap;
   }
 }
 
