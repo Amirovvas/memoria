@@ -181,12 +181,12 @@ export const TRACK_BY_ID = Object.fromEntries(TRACKS.map((t) => [t.id, t])) as R
 
 /** The track picked for an occasion until the person chooses one themselves. */
 export const OCCASION_TRACK: Record<Occasion, string> = {
-  birthday: "party-like-its-your-birthday",
-  anniversary: "true-love",
-  wedding: "wedding-harp",
-  love: "loving-you-is-easy",
-  thanks: "warm-happy",
-  other: "lo-fi-01",
+  birthday: "those-eyes",
+  anniversary: "those-eyes",
+  wedding: "those-eyes",
+  love: "those-eyes",
+  thanks: "those-eyes",
+  other: "those-eyes",
 }
 
 export const giftUrl = (id: string) => `${typeof window === "undefined" ? "" : window.location.origin}/g/${id}`
