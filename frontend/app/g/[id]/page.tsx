@@ -3,7 +3,7 @@ import { Suspense } from "react"
 import { GiftSplash, GiftView } from "@/src/components/gift/GiftView"
 
 export const metadata: Metadata = {
-  title: { absolute: "Для тебя есть сюрприз 🎁" },
+  title: { absolute: "Для тебя есть сюрприз" },
   description: "Открой — тут поздравление, фото и музыка",
   robots: { index: false, follow: false },
 }

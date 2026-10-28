@@ -1,5 +1,5 @@
 import { LAYOUTS, type ElementSpec } from "./layouts"
-import { isSamplePhoto } from "../photos"
+import { isSamplePhoto, isUserPhoto } from "../photos"
 import { PALETTES, STYLES, resolveColor } from "./styles"
 import type {
   CollageDoc,
@@ -205,6 +205,8 @@ export function applyLayout(doc: CollageDoc, layout: LayoutKey): CollageDoc {
     tone: doc.tone,
     look: doc.look,
     treatment: doc.treatment,
+    // fewer frames must not drop the photos that no longer fit from the collage's own list
+    photos: trayPhotos(doc),
   }
 }
 
@@ -251,8 +253,52 @@ export function autoPlace(doc: CollageDoc, srcs: string[]): CollageDoc {
   }
   return {
     ...doc,
-    elements: doc.elements.map((e) => (e.kind === "photo" && assign.has(e.id) ? { ...e, src: assign.get(e.id)! } : e)),
+    elements: doc.elements.map((e) => (e.kind === "photo" && assign.has(e.id) ? withPhoto(e, assign.get(e.id)!) : e)),
   }
+}
+
+/** A frame showing a new photo starts from the photo's centre, not the framing chosen for the old one. */
+export function withPhoto(el: PhotoEl, src: string | null): PhotoEl {
+  return { ...el, src, fx: undefined, fy: undefined, zoom: undefined }
+}
+
+/**
+ * Templates cut from a reference collage keep the original picture under their frames.
+ * Moving, resizing or removing such a frame would uncover the old photo, so the frames stay put.
+ */
+export function framesLocked(doc: CollageDoc) {
+  return doc.elements.some((e) => e.kind === "photo" && e.fixed)
+}
+
+/**
+ * Puts the frames of a reference template back where the original has them. Collages edited before
+ * the frames were locked may hold a moved frame that leaves the old photo showing beside the new one.
+ */
+export function anchorFrames(doc: CollageDoc): CollageDoc {
+  if (!framesLocked(doc)) return doc
+  const home = photoEls(buildDoc({ layout: doc.layout, style: doc.style, palette: doc.palette, photos: [], texts: textsFromDoc(doc) }))
+  let i = 0
+  let changed = false
+  const elements = doc.elements.map((e) => {
+    if (e.kind !== "photo" || e.fixed) return e
+    const h = home[i++]
+    if (!h || (e.x === h.x && e.y === h.y && e.w === h.w && e.h === h.h && e.rot === h.rot)) return e
+    changed = true
+    return { ...e, x: h.x, y: h.y, w: h.w, h: h.h, rot: h.rot }
+  })
+  return changed ? { ...doc, elements } : doc
+}
+
+/** The photos uploaded for this collage. Collages saved before it had its own list show the uploads they use. */
+export function trayPhotos(doc: CollageDoc): string[] {
+  if (doc.photos) return doc.photos
+  return [...new Set(photoEls(doc).flatMap((p) => (isUserPhoto(p.src) ? [p.src!] : [])))]
+}
+
+export function addToTray(doc: CollageDoc, srcs: string[]): CollageDoc {
+  const tray = trayPhotos(doc)
+  const fresh = srcs.filter((s) => isUserPhoto(s) && !tray.includes(s))
+  return fresh.length || !doc.photos ? { ...doc, photos: [...fresh, ...tray] } : doc
 }
 
 export function newTextEl(doc: CollageDoc, role: TextRole, text: string): TextEl {

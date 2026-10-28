@@ -4,7 +4,7 @@
  */
 
 import axios, { type Method } from "axios"
-import type { Gift, Occasion, Opening, PublicGift } from "./gifts"
+import type { Game, Gift, Occasion, Opening, PublicGift } from "./gifts"
 
 export interface User {
   id: string
@@ -149,6 +149,7 @@ export interface NewGift {
   signature: string
   finale: string
   animation: Opening
+  game: Game
   music: { track: string } | { path: string; title: string } | null
   collages: { path: string; w: number; h: number }[]
 }

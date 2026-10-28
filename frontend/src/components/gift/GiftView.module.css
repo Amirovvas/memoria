@@ -1,20 +1,28 @@
-/* The surprise page keeps these warm colours in both themes. */
+/* The surprise page is a night-time film and keeps these colours in both themes. */
+.surprise,
+.notice,
+.splash {
+  --night: #07070a;
+  --cream: #f4efe7;
+  --muted: #a89c8c;
+  --dim: #7d7365;
+  --gold: #e8c886;
+  --caps: #b9a98f;
+  color: var(--cream);
+  background: var(--night);
+}
 .relative {
   position: relative;
 }
-.terracotta {
-  color: #b4553a;
-}
-.eyebrow {
-  font-size: 13px;
+.caps {
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.3em;
-  color: #b07b66;
+  letter-spacing: 0.42em;
+  color: var(--caps);
 }
-.script {
-  font-family: var(--font-script);
-  color: #b4553a;
+.gold {
+  color: var(--gold);
 }
 .pressable {
   transition: all 0.15s var(--ease);
@@ -23,41 +31,49 @@
   scale: 0.97;
 }
 
-/* ---------- Backdrop ---------- */
+/* ---------- Backdrop: spotlight, gold dust, vignette, grain ---------- */
 .backdrop {
   pointer-events: none;
   position: fixed;
   inset: 0;
   overflow: hidden;
 }
-.paper {
+.spot {
+  position: absolute;
+  left: 50%;
+  top: -12%;
+  width: 150vmax;
+  height: 80vh;
+  translate: -50% 0;
+  background: radial-gradient(ellipse at top, rgb(255 228 180 / 0.2), transparent 62%);
+  animation: flicker 6s ease-in-out infinite;
+}
+.dust {
+  position: absolute;
+  bottom: -10px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #ffe2a8;
+  box-shadow: 0 0 8px 2px rgb(255 214 140 / 0.55);
+  opacity: 0;
+  animation-name: rise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.vignette {
   position: absolute;
   inset: 0;
-  background: linear-gradient(170deg, #fdf4ec 0%, #f9e6dc 48%, #f4dcd6 100%);
+  background: radial-gradient(ellipse at center, transparent 45%, rgb(0 0 0 / 0.78) 100%);
 }
-.glowWarm,
-.glowPink {
+/* film grain that jitters a few times a second, like a projector */
+.grain {
   position: absolute;
-  border-radius: 999px;
-}
-.glowWarm {
-  left: -33.333%;
-  top: -25%;
-  width: 90vmax;
-  height: 90vmax;
-  background: rgb(255 217 199 / 0.6);
-  filter: blur(90px);
-}
-.glowPink {
-  bottom: -33.333%;
-  right: -33.333%;
-  width: 80vmax;
-  height: 80vmax;
-  background: rgb(246 196 207 / 0.45);
-  filter: blur(100px);
-}
-.driftItem {
-  color: #e79a8c;
+  inset: -50%;
+  opacity: 0.11;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='180' height='180' filter='url(%23n)'/></svg>");
+  animation: grain 0.9s steps(4) infinite;
 }
 
 /* ---------- Music ---------- */
@@ -67,14 +83,15 @@
   right: 1rem;
   z-index: 40;
   display: flex;
-  height: 3rem;
-  max-width: min(240px, 70vw);
+  height: 2.75rem;
+  max-width: min(260px, 72vw);
   align-items: center;
   gap: 0.625rem;
   border-radius: 999px;
-  background: rgb(255 255 255 / 0.75);
+  background: rgb(20 18 16 / 0.72);
   padding: 0 1rem 0 0.375rem;
-  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.7), 0 12px 30px -14px rgb(90 40 25 / 0.55);
+  color: var(--cream);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.12), 0 14px 30px -12px rgb(0 0 0 / 0.8);
   backdrop-filter: blur(12px);
   transition: all 0.15s var(--ease);
 }
@@ -83,27 +100,28 @@
 }
 .musicIcon {
   display: grid;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2rem;
+  height: 2rem;
   flex-shrink: 0;
   place-items: center;
   border-radius: 999px;
-  background: #b4553a;
-  color: #fff;
+  background: var(--gold);
+  color: #111;
 }
 .playIcon {
   translate: 1px 0;
 }
 .equalizer {
   display: flex;
-  height: 0.875rem;
+  height: 0.75rem;
+  flex-shrink: 0;
   align-items: flex-end;
   gap: 2px;
 }
 .bar {
-  width: 3px;
+  width: 2px;
   border-radius: 999px;
-  background: #b4553a;
+  background: var(--gold);
 }
 .barIdle {
   height: 0.25rem;
@@ -113,11 +131,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
+  color: #d8cfc2;
 }
 
-/* ---------- Invitation ---------- */
+/* ---------- Invitation: a premiere poster ---------- */
 .invite {
   position: relative;
   display: flex;
@@ -125,80 +144,168 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2.5rem 1.5rem 4rem;
+  padding: 2.5rem 1.5rem 5rem;
   text-align: center;
 }
-.giftIcon {
-  margin: 0 auto;
-  display: grid;
-  width: 6rem;
-  height: 6rem;
-  place-items: center;
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.6);
-  font-size: 3rem;
-  line-height: 1;
-  box-shadow: 0 0 0 1px #fff, 0 20px 50px -20px rgb(180 85 58 / 0.6);
-  backdrop-filter: blur(8px);
-}
-.inviteEyebrow {
-  margin-top: 2.5rem;
-}
 .recipient {
-  margin-top: 1rem;
-  font-size: clamp(52px, 15vw, 88px);
+  margin-top: 1.25rem;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-family: var(--font-serif);
+  font-size: clamp(64px, 22vw, 128px);
+  font-weight: 500;
   line-height: 0.95;
+  text-shadow: 0 0 34px rgb(255 214 150 / 0.4), 0 0 2px rgb(255 240 210 / 0.6);
 }
 .inviteLead {
   margin: 1.25rem auto 0;
-  max-width: 280px;
-  font-family: var(--font-serif);
-  font-size: 1.25rem;
-  font-style: italic;
-  line-height: 1.375;
-  color: #7a5446;
+  max-width: 260px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--muted);
 }
 .openButton {
   margin-top: 3rem;
-  height: 4rem;
-  width: 100%;
-  max-width: 300px;
+  display: inline-flex;
+  height: 3.75rem;
+  align-items: center;
+  gap: 0.75rem;
   border-radius: 999px;
-  background: #b4553a;
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-  font-weight: 700;
-  color: #fff;
-  box-shadow: 0 20px 40px -14px rgb(180 85 58 / 0.85);
+  background: var(--cream);
+  padding: 0 2rem 0 0.625rem;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: #111;
+  box-shadow: 0 0 48px rgb(255 220 160 / 0.32);
+}
+.openIcon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: 999px;
+  background: #111;
+  color: var(--cream);
+  padding-left: 2px;
 }
 .soundHint {
-  margin-top: 1rem;
-  font-size: 0.75rem;
-  line-height: 1rem;
-  color: #9b7a6c;
+  margin-top: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 12px;
+  color: #8e8273;
+}
+.presents {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: max(28px, env(safe-area-inset-bottom));
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #6f6558;
 }
 
-/* ---------- Wishes ---------- */
-/* Space is reserved for the rest of the text, so nothing jumps while it types. */
-.typewriter {
+/* ---------- Countdown: 3-2-1 on a film leader ---------- */
+.countdown {
   position: relative;
-  cursor: default;
-  white-space: pre-line;
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.scratchLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgb(255 255 255 / 0.22);
+  animation: scratch 0.7s steps(3) infinite;
+}
+.leader {
+  position: relative;
+  display: grid;
+  width: min(62vw, 260px);
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid rgb(244 239 231 / 0.7);
+}
+.leader::before {
+  content: "";
+  position: absolute;
+  inset: 7%;
+  border-radius: 50%;
+  border: 1px solid rgb(244 239 231 / 0.35);
+}
+.sweep {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(rgb(244 239 231 / 0.2) var(--a, 0deg), transparent 0);
+  animation: sweep 0.95s linear forwards;
+}
+.crossV,
+.crossH {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: rgb(244 239 231 / 0.35);
+}
+.crossV {
+  width: 1px;
+  height: 140%;
+  translate: 0 -50%;
+}
+.crossH {
+  width: 130%;
+  height: 1px;
+  translate: -50% 0;
+}
+.leaderNum {
+  position: relative;
   font-family: var(--font-serif);
-  font-size: clamp(25px, 6.6vw, 34px);
-  font-weight: 500;
-  line-height: 1.28;
+  font-size: min(36vw, 150px);
+  font-weight: 600;
+  line-height: 1;
+  text-shadow: 0 0 30px rgb(255 214 150 / 0.45);
+  animation: numIn 0.95s ease both;
 }
-.invisible {
-  visibility: hidden;
+.reel {
+  margin-top: 2.5rem;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: #8e8273;
 }
+
+/* ---------- Wishes: titles between black bars ---------- */
 .wishes {
   position: relative;
   display: flex;
   min-height: 100dvh;
   flex-direction: column;
   justify-content: center;
-  padding: 5rem 1.75rem;
+  padding: 7rem 1.75rem;
+  text-align: center;
+}
+.wishes::before,
+.wishes::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 9vh;
+  background: #000;
+}
+.wishes::before {
+  top: 0;
+}
+.wishes::after {
+  bottom: 0;
 }
 .wishesInner {
   margin: 0 auto;
@@ -206,12 +313,36 @@
   max-width: 520px;
 }
 .message {
-  margin-top: 1.25rem;
+  margin-top: 1.75rem;
+}
+/* space is reserved for the rest of the text, so nothing jumps while it types */
+.typewriter {
+  position: relative;
+  cursor: default;
+  white-space: pre-line;
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 7vw, 36px);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.34;
+}
+.caret {
+  display: inline-block;
+  width: 2px;
+  height: 0.9em;
+  margin-left: 2px;
+  vertical-align: -0.1em;
+  background: var(--gold);
+  animation: blink 1s steps(1) infinite;
+}
+.invisible {
+  visibility: hidden;
 }
 .signature {
   margin-top: 2rem;
-  text-align: right;
-  font-size: clamp(30px, 8vw, 40px);
+  font-family: var(--font-script);
+  font-size: clamp(32px, 9vw, 44px);
+  color: var(--gold);
   translate: 0 0.75rem;
   opacity: 0;
   transition: all 1s var(--ease);
@@ -220,11 +351,11 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 88px;
+  bottom: calc(9vh + 18px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #9b7a6c;
+  color: var(--dim);
   opacity: 0;
   transition: opacity 1s var(--ease);
 }
@@ -233,54 +364,119 @@
   opacity: 1;
 }
 .scrollLabel {
-  font-size: 0.75rem;
-  line-height: 1rem;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-}
-@keyframes bounce {
-  0%,
-  100% {
-    transform: translateY(-25%);
-    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-  }
-  50% {
-    transform: none;
-    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-  }
+  letter-spacing: 0.32em;
 }
 .bounce {
   margin-top: 0.25rem;
   animation: bounce 1s infinite;
 }
 
-/* ---------- Gallery ---------- */
+/* ---------- Gallery: a strip of film ---------- */
 .gallery {
   position: relative;
-  padding: 1rem 1.75rem 2.5rem;
+  overflow: hidden;
+  padding: 2rem 0 3rem;
+  text-align: center;
 }
-.galleryList {
-  margin: 0 auto;
+.galleryEyebrow {
+  margin-bottom: 1.25rem;
+}
+.strip {
+  position: relative;
+  margin-left: -6vw;
+  width: 112vw;
+  padding: 34px 0;
+  background: #121212;
+  rotate: -2.5deg;
+  box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.8);
+}
+.holes {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background-image: repeating-linear-gradient(90deg, transparent 0 10px, #e9dfcf 10px 22px, transparent 22px 30px);
+  opacity: 0.85;
+}
+.holesTop {
+  top: 10px;
+}
+.holesBottom {
+  bottom: 10px;
+}
+.reel2 {
   display: flex;
-  max-width: 460px;
-  flex-direction: column;
-  gap: 3.5rem;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
 }
-.print {
-  display: block;
-  width: 100%;
+/* half a screen of empty film on both ends, so the first and last frames can sit in the middle */
+.reel2::before,
+.reel2::after {
+  content: "";
+  flex: 0 0 calc(50% - 6px);
+}
+.frame {
+  flex-shrink: 0;
+  height: min(58vh, 520px);
+  aspect-ratio: var(--ratio);
+  max-width: 78vw;
+  overflow: hidden;
   border-radius: 3px;
-  background: #fffdf8;
-  padding: 4% 4% 13%;
-  text-align: left;
-  box-shadow: 0 30px 60px -28px rgb(90 40 25 / 0.55), 0 6px 16px -8px rgb(90 40 25 / 0.3);
+  scroll-snap-align: center;
+  filter: brightness(0.42) saturate(0.8);
+  scale: 0.94;
+  transition: filter 0.4s ease, scale 0.4s ease;
 }
-.printImage {
+.frameActive {
+  filter: none;
+  scale: 1;
+}
+.frameImage {
   display: block;
-  height: auto;
   width: 100%;
-  background: #f1e7dc;
+  height: 100%;
+  object-fit: cover;
+}
+.stock {
+  position: absolute;
+  bottom: 24px;
+  left: 14vw;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: #e8b25a;
+  opacity: 0.85;
+}
+.frameInfo {
+  margin-top: 2rem;
+}
+.stripDots {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+.stripDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.25);
+  transition: all 0.2s var(--ease);
+}
+.stripDotOn {
+  width: 18px;
+  background: var(--gold);
+}
+.swipe {
+  margin-top: 0.875rem;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: #8e8273;
 }
 
 /* ---------- Lightbox ---------- */
@@ -290,9 +486,8 @@
   z-index: 50;
   display: flex;
   flex-direction: column;
-  background: rgb(27 20 17 / 0.95);
+  background: rgb(0 0 0 / 0.96);
   color: #fff;
-  backdrop-filter: blur(4px);
 }
 .lightboxTop {
   display: flex;
@@ -302,11 +497,11 @@
   padding: max(12px, env(safe-area-inset-top)) 1rem 0.5rem;
 }
 .counter {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: rgb(255 255 255 / 0.7);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--caps, #b9a98f);
 }
 .closeButton {
   display: grid;
@@ -342,7 +537,7 @@
   user-select: none;
   border-radius: 3px;
   object-fit: contain;
-  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  box-shadow: 0 0 60px rgb(255 214 150 / 0.12);
 }
 .arrow {
   position: absolute;
@@ -383,77 +578,120 @@
   height: 0.375rem;
   width: 0.375rem;
   border-radius: 999px;
-  background: rgb(255 255 255 / 0.35);
+  background: rgb(255 255 255 / 0.3);
   transition: all 0.15s var(--ease);
 }
 .dotActive {
   width: 1.5rem;
-  background: #fff;
+  background: #e8c886;
 }
 
-/* ---------- Finale ---------- */
+/* ---------- Finale: the last frame ---------- */
 .finale {
   position: relative;
   display: flex;
-  min-height: 80dvh;
-  flex-direction: column;
+  min-height: 100dvh;
   align-items: center;
   justify-content: center;
-  padding: 4rem 1.75rem 8rem;
+  overflow: hidden;
+  padding: 4rem 1.75rem 7rem;
   text-align: center;
 }
-.finaleTitle {
-  font-size: clamp(44px, 13vw, 72px);
-  line-height: 1.05;
+.finaleBg {
+  position: absolute;
+  inset: -4%;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.36) blur(2px) saturate(0.9);
 }
-.replay {
-  margin-top: 2.5rem;
-  display: inline-flex;
-  height: 3.5rem;
-  align-items: center;
-  gap: 0.5rem;
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.8);
-  padding: 0 1.75rem;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  font-weight: 600;
-  box-shadow: 0 0 0 1px #fff, 0 16px 40px -18px rgb(120 60 40 / 0.6);
-  backdrop-filter: blur(8px);
+.finaleShade {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 30%, rgb(0 0 0 / 0.8) 100%), linear-gradient(to bottom, var(--night), transparent 22%);
 }
-.credits {
-  margin-top: 5rem;
+.spark {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #ffe2a8;
+  box-shadow: 0 0 10px 3px rgb(255 214 140 / 0.7);
+  animation: twinkle 2.6s ease-in-out infinite;
+}
+.finaleInner {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.finaleTitle {
+  margin-top: 1rem;
+  font-family: var(--font-serif);
+  font-size: clamp(48px, 14vw, 84px);
+  font-weight: 500;
+  line-height: 1.02;
+  text-shadow: 0 0 34px rgb(255 214 150 / 0.45), 0 0 2px rgb(255 240 210 / 0.6);
+}
+.heart {
+  display: block;
+  overflow: visible;
+}
+.finaleHeart {
+  margin-top: 1.25rem;
+  width: 44px;
+  height: 40px;
+  filter: drop-shadow(0 0 14px rgb(255 90 120 / 0.65)) drop-shadow(0 4px 6px rgb(0 0 0 / 0.4));
+  animation: beat 1.4s ease-in-out infinite;
+}
+.theEnd {
+  margin-top: 1.75rem;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-style: italic;
+  color: #cfc4b4;
+}
+.finaleButtons {
+  margin-top: 2.25rem;
+  display: flex;
+  width: 240px;
+  flex-direction: column;
   gap: 0.75rem;
 }
-.madeIn {
-  font-size: 0.75rem;
-  line-height: 1rem;
-  color: #9b7a6c;
-}
-.brand {
-  font-family: var(--font-serif);
-  font-size: 15px;
-  font-weight: 600;
-  font-style: italic;
-  color: #7a5446;
-}
+.replay,
 .makeOwn {
   display: inline-flex;
-  height: 2.5rem;
+  height: 3.25rem;
   align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   border-radius: 999px;
-  border: 1px solid #d9b8a8;
-  padding: 0 1.25rem;
-  font-size: 13px;
-  font-weight: 600;
-  color: #7a5446;
+  font-size: 14px;
+  font-weight: 800;
+}
+.replay {
+  background: var(--cream);
+  color: #111;
+  box-shadow: 0 0 40px rgb(255 220 160 / 0.25);
+}
+.makeOwn {
+  border: 1px solid rgb(255 255 255 / 0.3);
+  color: #e8dfd2;
   transition: background-color 0.15s var(--ease);
 }
 .makeOwn:hover {
-  background: rgb(255 255 255 / 0.6);
+  background: rgb(255 255 255 / 0.08);
+}
+.madeIn {
+  margin-top: 3rem;
+  font-size: 11px;
+  color: var(--dim);
+}
+.brand {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--muted);
 }
 
 /* ---------- Page ---------- */
@@ -480,23 +718,19 @@
   padding: 0 2rem;
   text-align: center;
 }
-.emoji {
-  font-size: 3rem;
-  line-height: 1;
-}
 .noticeTitle {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   font-family: var(--font-serif);
-  font-size: 2.25rem;
-  line-height: 2.5rem;
+  font-size: 2.5rem;
+  line-height: 1.1;
   font-weight: 500;
 }
 .noticeText {
-  margin: 0.75rem auto 0;
+  margin: 0.875rem auto 0;
   max-width: 20rem;
   font-size: 15px;
-  line-height: 1.625;
-  color: #7a5446;
+  line-height: 1.6;
+  color: var(--muted);
 }
 .noticeLink {
   margin-top: 2rem;
@@ -504,14 +738,159 @@
   height: 3rem;
   align-items: center;
   border-radius: 999px;
-  background: #b4553a;
+  background: var(--cream);
   padding: 0 1.5rem;
-  font-weight: 600;
-  color: #fff;
+  font-weight: 800;
+  color: #111;
 }
 .splash {
   position: relative;
   display: grid;
   min-height: 100dvh;
   place-items: center;
+}
+/* a film reel turning while the gift loads */
+.splashReel {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid rgb(244 239 231 / 0.6);
+  background: radial-gradient(circle, var(--night) 0 5px, transparent 6px),
+    radial-gradient(circle at 50% 22%, rgb(244 239 231 / 0.5) 0 6px, transparent 7px),
+    radial-gradient(circle at 50% 78%, rgb(244 239 231 / 0.5) 0 6px, transparent 7px),
+    radial-gradient(circle at 22% 50%, rgb(244 239 231 / 0.5) 0 6px, transparent 7px),
+    radial-gradient(circle at 78% 50%, rgb(244 239 231 / 0.5) 0 6px, transparent 7px);
+  animation: spin 1.4s linear infinite;
+}
+
+/* ---------- Motion ---------- */
+@keyframes rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  15%,
+  80% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-105vh) translateX(30px);
+  }
+}
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.86;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+@keyframes grain {
+  25% {
+    transform: translate(-6%, 4%);
+  }
+  50% {
+    transform: translate(5%, -7%);
+  }
+  75% {
+    transform: translate(-3%, -4%);
+  }
+}
+@keyframes scratch {
+  33% {
+    translate: 6px 0;
+    opacity: 0.4;
+  }
+  66% {
+    translate: -4px 0;
+    opacity: 0.9;
+  }
+}
+@property --a {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes sweep {
+  to {
+    --a: 360deg;
+  }
+}
+@keyframes numIn {
+  0% {
+    opacity: 0;
+    scale: 1.25;
+    filter: blur(6px);
+  }
+  20%,
+  85% {
+    opacity: 1;
+    scale: 1;
+    filter: none;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+    scale: 0.6;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.2;
+  }
+}
+@keyframes beat {
+  0%,
+  100% {
+    scale: 1;
+  }
+  15% {
+    scale: 1.16;
+  }
+  30% {
+    scale: 1;
+  }
+  45% {
+    scale: 1.1;
+  }
+}
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grain,
+  .spot,
+  .dust,
+  .scratchLine,
+  .spark,
+  .finaleHeart {
+    animation: none;
+  }
 }

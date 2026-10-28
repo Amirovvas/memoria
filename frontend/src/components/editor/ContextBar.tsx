@@ -1,10 +1,11 @@
 "use client"
 
-import { ChevronDown, ImagePlus, Minus, PencilLine, Plus, RefreshCw, Sparkles, Trash2, Upload, X } from "lucide-react"
+import { ChevronDown, ImagePlus, Minus, PencilLine, Plus, RefreshCw, Sparkles, Trash2, Upload, X, ZoomIn, ZoomOut } from "lucide-react"
 import type { ReactNode } from "react"
+import { framesLocked, trayPhotos, withPhoto } from "@/src/lib/collage/build"
 import { FONTS, PALETTES, TEXT_SWATCHES } from "@/src/lib/collage/styles"
-import type { FontKey, TextEl } from "@/src/lib/collage/types"
-import { useApp } from "../providers/AppProvider"
+import type { FontKey, PhotoEl, TextEl } from "@/src/lib/collage/types"
+import { cropOf } from "@/src/lib/photos"
 import { Popover } from "../ui/Menu"
 import { useEditor } from "./context"
 import { CaptionAssistant } from "./panels"
@@ -141,10 +142,31 @@ function TextTools({ el, side }: { el: TextEl; side: "top" | "bottom" }) {
   )
 }
 
+const ZOOM_STEP = 1.2
+const MAX_ZOOM = 4
+
+/** Zooms the photo inside its frame; dragging the photo picks which part shows. */
+function PhotoZoom({ el }: { el: PhotoEl }) {
+  const { updateEl } = useEditor()
+  const zoom = el.zoom ?? 1
+  const set = (z: number) => updateEl(el.id, { zoom: z <= 1.001 ? undefined : +Math.min(MAX_ZOOM, z).toFixed(3) })
+  return (
+    <div className={s.size} title="Перетащите фото, чтобы выбрать нужную часть">
+      <button className={`icon-btn ${s.sizeButton}`} disabled={zoom <= 1} onClick={() => set(zoom / ZOOM_STEP)} aria-label="Отдалить фото">
+        <ZoomOut size={15} />
+      </button>
+      <span className={s.sizeValue}>{Math.round(zoom * 100)}%</span>
+      <button className={`icon-btn ${s.sizeButton}`} disabled={zoom >= MAX_ZOOM} onClick={() => set(zoom * ZOOM_STEP)} aria-label="Приблизить фото">
+        <ZoomIn size={15} />
+      </button>
+    </div>
+  )
+}
+
 function ReplaceMenu({ slotId, hasPhoto, side }: { slotId: string; hasPhoto: boolean; side: "top" | "bottom" }) {
-  const { placePhoto, openFilePicker, setTool } = useEditor()
-  const { uploads } = useApp()
-  if (!uploads.length) {
+  const { doc, placePhoto, openFilePicker, setTool } = useEditor()
+  const tray = trayPhotos(doc)
+  if (!tray.length) {
     return (
       <BarButton onClick={() => openFilePicker(slotId)}>
         {hasPhoto ? <RefreshCw size={15} /> : <ImagePlus size={15} />} {hasPhoto ? "Заменить фото" : "Добавить фото"}
@@ -174,17 +196,17 @@ function ReplaceMenu({ slotId, hasPhoto, side }: { slotId: string; hasPhoto: boo
           </button>
           <p className={`eyebrow ${s.uploadsEyebrow}`}>Из загруженных</p>
           <div className={`scrollbar-thin ${s.thumbs}`}>
-            {uploads.map((u) => (
+            {tray.map((src) => (
               <button
-                key={u.id}
+                key={src}
                 onClick={() => {
-                  placePhoto(slotId, u.src)
+                  placePhoto(slotId, src)
                   close()
                 }}
                 className={s.thumb}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={u.src} alt={u.name} className={s.cover} />
+                <img src={src} alt="" className={s.cover} />
               </button>
             ))}
           </div>
@@ -204,7 +226,7 @@ function ReplaceMenu({ slotId, hasPhoto, side }: { slotId: string; hasPhoto: boo
 }
 
 export function ContextBar({ side = "bottom" }: { side?: "top" | "bottom" }) {
-  const { selected, updateEl, removeEl, select } = useEditor()
+  const { doc, selected, updateEl, removeEl, select } = useEditor()
   if (!selected) return null
 
   let tools: ReactNode
@@ -212,16 +234,27 @@ export function ContextBar({ side = "bottom" }: { side?: "top" | "bottom" }) {
     tools = (
       <>
         <ReplaceMenu slotId={selected.id} hasPhoto={!!selected.src} side={side} />
-        <Divider />
+        {selected.src && !cropOf(selected.src) ? (
+          <>
+            <Divider />
+            <PhotoZoom el={selected} />
+          </>
+        ) : null}
         {selected.src ? (
-          <BarButton onClick={() => updateEl(selected.id, { src: null })} danger>
-            <Trash2 size={15} /> Удалить фото
-          </BarButton>
-        ) : (
-          <BarButton onClick={() => removeEl(selected.id)} danger>
-            <Trash2 size={15} /> Убрать рамку
-          </BarButton>
-        )}
+          <>
+            <Divider />
+            <BarButton onClick={() => updateEl(selected.id, withPhoto(selected, null))} danger>
+              <Trash2 size={15} /> Удалить фото
+            </BarButton>
+          </>
+        ) : !framesLocked(doc) ? (
+          <>
+            <Divider />
+            <BarButton onClick={() => removeEl(selected.id)} danger>
+              <Trash2 size={15} /> Убрать рамку
+            </BarButton>
+          </>
+        ) : null}
       </>
     )
   } else if (selected.kind === "text") {

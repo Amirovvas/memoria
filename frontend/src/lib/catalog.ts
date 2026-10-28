@@ -394,9 +394,9 @@ const ENTRIES: Record<string, Entry[]> = {
     ["Ночная мозаика", "mosaic", "minimal", "black"],
     ["Средиземноморье", "arches", "minimal", "ocean"],
     ["Чинкве-Терре", "overlap", "collage", "terracotta"],
-    ["Рим на четырёх кадрах", "grid4", "night", "black", undefined, { photos: own(REF.roma), texts: { title: "📍 ROMA", date: "" }, featured: true }],
+    ["Рим на четырёх кадрах", "grid4", "night", "black", undefined, { photos: own(REF.roma), texts: { title: "ROMA", date: "" }, featured: true }],
     ["Вьетнам", "travel-mosaic", "dreamy", "black", undefined, { photos: own(REF.vietnam), texts: { title: "Vietnam" }, featured: true }],
-    ["Озеро Комо", "stack-caption", "night", "black", undefined, { photos: own(REF.como), texts: { subtitle: "Lake como 📍" }, featured: true }],
+    ["Озеро Комо", "stack-caption", "night", "black", undefined, { photos: own(REF.como), texts: { subtitle: "Lake como" }, featured: true }],
     ["Travel dump", "grid9-dump", "dump", "neon", undefined, { photos: swap(own(REF.travelDump), { 3: photo("oldStreet"), 4: photo("venice"), 5: photo("balloons") }), texts: { title: "Travel", note: "Dump" }, featured: true }],
     ["Заметки в пути", "trail-notes", "notes", "white", undefined, { photos: own(REF.trail), texts: { title: "away from real life", subtitle: "Escaping the ordinary, embracing the extraordinary.", note: "Traveling because adulting is hard." }, featured: true }],
     ["Дорога домой", "quote-bw", "collage", "mist", undefined, { look: "noir", texts: { title: "collect moments, not things." } }],
@@ -421,7 +421,7 @@ const ENTRIES: Record<string, Entry[]> = {
     ["Медовый месяц", "stack-caption", "night", "black", undefined, { texts: { subtitle: "honeymoon ♡" } }],
     ["Судьба", "stack-quote", "quiet", "black", undefined, { look: "golden", texts: { subtitle: "you were meant to be mine." } }],
     ["Любовь в деталях", "quote-bw", "collage", "mist", undefined, { look: "noir", texts: { title: "you are my favorite memory." } }],
-    ["Paris", "grid4", "night", "black", undefined, { texts: { title: "📍 PARIS", date: "" } }],
+    ["Paris", "grid4", "night", "black", undefined, { texts: { title: "PARIS", date: "" } }],
   ],
   birthday: [
     ["Праздник в конфетти", "celebration", "polaroid", "butter"],
@@ -472,7 +472,7 @@ const ENTRIES: Record<string, Entry[]> = {
     ["Лучшее в воспоминаниях", "quote-bw", "collage", "mist", undefined, { photos: own(REF.memoriesQuote), look: "noir", texts: { title: "the best thing about memories is making them." }, featured: true }],
     ["Make this your year", "dark-scrapbook", "minimal", "black", undefined, { photos: own(REF.roadTrip), look: "kodak", featured: true }],
     ["Тёплое лето", "stack-quote", "quiet", "black", undefined, { look: "golden", texts: { subtitle: "some days stay with you forever." } }],
-    ["Наш отпуск", "grid4", "night", "black", undefined, { texts: { title: "📍 SUMMER 25", date: "" } }],
+    ["Наш отпуск", "grid4", "night", "black", undefined, { texts: { title: "SUMMER 25", date: "" } }],
     ["Лето в горах", "torn-stack", "dreamy", "white", undefined, { photos: shots("cloudSea", "dolomites", "hazyPeaks", "starryPeaks"), texts: { note: "то самое лето в горах" } }],
   ],
   family: [
@@ -482,7 +482,7 @@ const ENTRIES: Record<string, Entry[]> = {
     ["Семейный альбом", "polaroid-scatter", "polaroid", "sand", "Семейный альбом"],
     ["Лето у бабушки", "backdrop", "polaroid", "sage", "Лето"],
     ["Family", "heart", "minimal", "white", undefined, { photos: own(REF.home), look: "kodak", texts: { title: "family", date: "[ˈfam(ə)lē] noun", subtitle: "where life begins and love never ends." } }],
-    ["Лето всей семьёй", "stack-caption", "night", "black", undefined, { texts: { subtitle: "summer with family ☀" } }],
+    ["Лето всей семьёй", "stack-caption", "night", "black", undefined, { texts: { subtitle: "summer with family" } }],
     ["Семейная вылазка", "trail-notes", "notes", "white", undefined, { photos: own(REF.trail), texts: { title: "family time", subtitle: "Together is our favorite place to be.", note: "Small trips, big memories." } }],
   ],
   graduation: [

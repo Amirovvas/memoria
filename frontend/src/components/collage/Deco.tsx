@@ -45,7 +45,7 @@ export function DecoArt({
             BOARDING PASS
           </text>
           <text x="95" y="7" fontSize="4.4" fill="#fff" style={{ fontFamily: MONO }} textAnchor="end">
-            ✈ 1ST
+            1ST CLASS
           </text>
           <text x="5" y="20" fontSize="8.2" fill="#2a241d" style={{ fontFamily: MONO }} fontWeight="600">
             {label || "ROMA → NAPOLI"}

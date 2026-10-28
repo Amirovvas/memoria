@@ -2,11 +2,12 @@
 
 import { Check, ImagePlus, Loader2, Plus, Sparkles, Type, Upload, Wand2, X } from "lucide-react"
 import { useMemo, useState, type ReactNode } from "react"
-import { CATEGORY_BY_SLUG, TEMPLATES, captionsFor, templateDoc, templatesFor } from "@/src/lib/catalog"
-import { applyLayout, emptySlotCount, newTextEl, photoEls, restyle, uid } from "@/src/lib/collage/build"
+import { CATEGORY_BY_SLUG, TEMPLATES, captionsFor, templateDoc } from "@/src/lib/catalog"
+import { applyLayout, buildDoc, emptySlotCount, newTextEl, photoEls, restyle, textsFromDoc, trayPhotos, uid } from "@/src/lib/collage/build"
 import { LAYOUTS, LAYOUT_KEYS } from "@/src/lib/collage/layouts"
 import { BACKGROUND_SWATCHES, DECOS, FORMATS, PALETTES, PATTERNS, STYLES, resolveColor } from "@/src/lib/collage/styles"
 import type { CollageDoc, DecoEl, DecoKey, PaletteKey, PatternKey, StyleKey, TextEl, TextRole } from "@/src/lib/collage/types"
+import { cropOf } from "@/src/lib/photos"
 import { CollageCanvas } from "../collage/CollageCanvas"
 import { DecoArt } from "../collage/Deco"
 import { useApp } from "../providers/AppProvider"
@@ -30,44 +31,30 @@ function Group({ title, action, children, className = "" }: { title: string; act
 
 export function TemplatesPanel() {
   const { doc, commit, category } = useEditor()
-  const cat = CATEGORY_BY_SLUG[category] ? category : "travel"
-  const templates = templatesFor(cat).length ? templatesFor(cat) : TEMPLATES.slice(0, 8)
-  const photosKey = photoEls(doc)
-    .map((p) => p.src?.slice(-24))
-    .join("|")
 
-  // Each composition is previewed with the user's own photos and texts.
-  const layouts = useMemo(
-    () => LAYOUT_KEYS.filter((k) => k !== "blank").map((k) => ({ key: k, doc: applyLayout(doc, k) })),
+  // Each composition is previewed as its original template, sample photos included, so the user's
+  // own photos never look as if they already belonged to another collage. A pick still takes them along.
+  const layouts = useMemo(() => {
+    // compositions no template uses get the category's stock photos instead of empty frames
+    const pool = [
+      ...new Set(TEMPLATES.filter((t) => t.category === category).flatMap((t) => t.photos.filter((p): p is string => !!p && !cropOf(p)))),
+    ]
+    // repeated round, so a composition with more frames than samples still has none empty
+    const stock = pool.length ? Array.from({ length: 24 }, (_, i) => pool[i % pool.length]) : []
+    return LAYOUT_KEYS.filter((k) => k !== "blank").map((k) => {
+      const own = TEMPLATES.find((t) => t.layout === k && t.category === category) ?? TEMPLATES.find((t) => t.layout === k)
+      return {
+        key: k,
+        doc: own ? templateDoc(own) : buildDoc({ layout: k, palette: doc.palette, style: doc.style, photos: stock, texts: textsFromDoc(doc) }),
+      }
+    })
+  },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [photosKey, doc.style, doc.palette, doc.bg, doc.pattern],
+    [category],
   )
 
   return (
     <>
-      <Group title={`Шаблоны · ${CATEGORY_BY_SLUG[cat].short}`}>
-        <div className={s.thumbs}>
-          {templates.map((t) => {
-            const active = doc.layout === t.layout && doc.style === t.style && doc.palette === t.palette
-            return (
-              <button
-                key={t.id}
-                onClick={() => commit((d) => ({ ...restyle(applyLayout(d, t.layout), { style: t.style, palette: t.palette }), look: t.look }))}
-                className={cx(s.tile, active && s.tileActive)}
-                title={t.title}
-              >
-                <CollageCanvas doc={templateDoc(t)} imgWidth={220} />
-                {active ? (
-                  <span className={s.check}>
-                    <Check size={12} />
-                  </span>
-                ) : null}
-              </button>
-            )
-          })}
-        </div>
-      </Group>
-
       <Group title="Композиция с вашими фото">
         <div className={s.thumbs}>
           {layouts.map(({ key, doc: d }) => (
@@ -105,14 +92,24 @@ export function TemplatesPanel() {
 export const PHOTO_MIME = "application/x-memoria-photo"
 
 export function PhotosPanel() {
-  const { doc, selected, placePhoto, autoFill, openFilePicker } = useEditor()
-  const { uploads, removeUpload, addDemoPhotos } = useApp()
+  const { doc, commit, projectId, selected, placePhoto, autoFill, openFilePicker } = useEditor()
+  const { uploads, removeUpload, addDemoPhotos, activeProjects, trashedProjects } = useApp()
   const [demoLoading, setDemoLoading] = useState(false)
   const slots = photoEls(doc)
   const empty = emptySlotCount(doc)
   const filled = slots.length - empty
   const used = new Set(slots.map((slot) => slot.src))
   const target = selected?.kind === "photo" ? selected : null
+  // only the photos brought into this collage; other collages keep theirs to themselves
+  const tray = trayPhotos(doc)
+
+  const removeFromTray = (src: string) => {
+    commit((d) => ({ ...d, photos: trayPhotos(d).filter((x) => x !== src) }))
+    // the file goes once no frame here and no other collage needs it
+    const elsewhere = [...activeProjects, ...trashedProjects].some((p) => p.id !== projectId && JSON.stringify(p.doc).includes(src))
+    const upload = uploads.find((u) => u.src === src)
+    if (upload && !used.has(src) && !elsewhere) removeUpload(upload.id)
+  }
 
   return (
     <>
@@ -152,42 +149,42 @@ export function PhotosPanel() {
             <span key={slot.id} className={cx(s.bar, slot.src && s.barFilled)} />
           ))}
         </div>
-        <button className={`btn btn-sm btn-primary ${s.autofill}`} disabled={!uploads.length} onClick={() => autoFill()}>
+        <button className={`btn btn-sm btn-primary ${s.autofill}`} disabled={!tray.length} onClick={() => autoFill()}>
           <Wand2 size={14} /> Разместить автоматически
         </button>
-        {!uploads.length ? <p className={s.needUploads}>Сначала загрузите фотографии</p> : null}
+        {!tray.length ? <p className={s.needUploads}>Сначала загрузите фотографии</p> : null}
       </div>
 
-      {uploads.length ? (
-        <Group title={`Загружено · ${uploads.length}`} className={s.groupSpaced}>
+      {tray.length ? (
+        <Group title={`Загружено · ${tray.length}`} className={s.groupSpaced}>
           <p className={s.uploadsHint}>
             {target
-              ? "Нажмите на фото — оно встанет в выбранную рамку."
+              ? "Нажмите на фото — оно встанет в выбранную рамку. Чтобы выбрать часть снимка, перетащите его внутри рамки."
               : "Перетащите фото на рамку коллажа или нажмите, чтобы добавить в свободное место."}
           </p>
           <div className={s.uploads}>
-            {uploads.map((u) => (
-              <div key={u.id} className={s.upload}>
+            {tray.map((src) => (
+              <div key={src} className={s.upload}>
                 <button
                   draggable
                   onDragStart={(e) => {
-                    e.dataTransfer.setData(PHOTO_MIME, u.src)
+                    e.dataTransfer.setData(PHOTO_MIME, src)
                     e.dataTransfer.effectAllowed = "copy"
                   }}
-                  onClick={() => (target ? placePhoto(target.id, u.src) : autoFill([u.src]))}
+                  onClick={() => (target ? placePhoto(target.id, src) : autoFill([src]))}
                   className={s.uploadButton}
-                  title={u.name}
+                  title={uploads.find((u) => u.src === src)?.name}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={u.src} alt={u.name} className={s.cover} draggable={false} />
+                  <img src={src} alt="" className={s.cover} draggable={false} />
                 </button>
-                {used.has(u.src) ? (
+                {used.has(src) ? (
                   <span className={s.usedMark}>
                     <Check size={10} strokeWidth={3} />
                   </span>
                 ) : null}
                 <button
-                  onClick={() => removeUpload(u.id)}
+                  onClick={() => removeFromTray(src)}
                   className={s.remove}
                   aria-label="Убрать из загруженных"
                 >

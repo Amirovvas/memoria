@@ -47,6 +47,9 @@
   font-weight: 600;
   color: #5b3a2e;
   backdrop-filter: blur(8px);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 .qr {
   position: absolute;
@@ -135,4 +138,10 @@
 }
 .danger {
   background: #b4553a;
+}
+
+.subIcon {
+  display: inline-block;
+  margin-right: 0.3rem;
+  vertical-align: -2px;
 }

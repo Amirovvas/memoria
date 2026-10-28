@@ -1,5 +1,6 @@
 "use client"
 
+import { Heart, Pointer } from "lucide-react"
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react"
 import { confettiFrom } from "@/src/lib/confetti"
 import type { Opening as OpeningKind } from "@/src/lib/gifts"
@@ -35,15 +36,21 @@ function EnvelopeArt({ phase, name, demo }: { phase: string; name?: string; demo
           <div className={s.cardText}>
             <p className={s.forYou}>для тебя</p>
             <p className={s.envName}>{name}</p>
-            <p className={`${s.heart} ${s.heartLarge}`}>♥</p>
+            <p className={`${s.heart} ${s.heartLarge}`}>
+              <Heart fill="currentColor" strokeWidth={0} className={s.heartIcon} />
+            </p>
           </div>
         ) : (
-          <span className={s.heart}>♥</span>
+          <span className={s.heart}>
+            <Heart fill="currentColor" strokeWidth={0} className={s.heartIcon} />
+          </span>
         )}
       </div>
       <div className={s.envFront} />
       <div className={s.envFlap} />
-      <div className={s.envSeal}>♥</div>
+      <div className={s.envSeal}>
+        <Heart fill="currentColor" strokeWidth={0} className={s.sealIcon} />
+      </div>
     </div>
   )
 }
@@ -189,11 +196,13 @@ function Cake({ onDone }: { onDone: () => void }) {
       </div>
       <div className={s.cakeFooter}>
         {done ? (
-          <p className={`${s.giftRise} ${s.hooray}`}>Ура! 🎉</p>
+          <p className={`${s.giftRise} ${s.hooray}`}>Ура!</p>
         ) : (
           <>
             <p className={s.hintTrack} aria-hidden>
-              <span className={`${s.swipeHint} ${s.hintHand}`}>👆</span>
+              <span className={`${s.swipeHint} ${s.hintHand}`}>
+                <Pointer size={24} strokeWidth={1.8} />
+              </span>
             </p>
             <p className={s.swipeText}>Проведи пальцем по свечам</p>
             <p className={s.swipeLeft}>{left === CANDLES ? "или нажми на каждую" : `осталось: ${left}`}</p>

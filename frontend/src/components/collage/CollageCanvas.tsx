@@ -1,7 +1,8 @@
 "use client"
 
-import { ImagePlus } from "lucide-react"
+import { Plus } from "lucide-react"
 import { memo, type CSSProperties, type DragEvent, type PointerEvent, type Ref } from "react"
+import { framesLocked } from "@/src/lib/collage/build"
 import { DECOS, FONTS, FORMATS, LOOKS, PALETTES, TONES, patternStyle } from "@/src/lib/collage/styles"
 import type { CollageDoc, CollageEl, DecoEl, PhotoEl, TextEl } from "@/src/lib/collage/types"
 import { cropOf, fallbackSrc, sizedSrc } from "@/src/lib/photos"
@@ -52,6 +53,12 @@ function tornClip(id: string) {
   return `polygon(${pts.join(",")})`
 }
 
+/** Rough brightness of a #rrggbb colour, 0–1; enough to tell a light colour from a dark one. */
+function luminance(hex: string) {
+  const n = parseInt(hex.slice(1, 7), 16)
+  return (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255
+}
+
 function shapeRadius(el: PhotoEl, ratio: number): string | undefined {
   if (el.shape === "circle") return "50%"
   if (el.shape === "arch") {
@@ -61,10 +68,21 @@ function shapeRadius(el: PhotoEl, ratio: number): string | undefined {
   return undefined
 }
 
+/**
+ * The part of the photo the frame shows. Scaling around the same point the photo is aligned to
+ * keeps fx/fy spanning the whole picture at any zoom: 0 shows its left (top) edge, 100 its right (bottom).
+ */
+function framing(el: PhotoEl): CSSProperties | undefined {
+  if (el.fx === undefined && el.fy === undefined && !el.zoom) return undefined
+  const at = `${el.fx ?? 50}% ${el.fy ?? 50}%`
+  return { objectPosition: at, transformOrigin: at, transform: el.zoom && el.zoom !== 1 ? `scale(${el.zoom})` : undefined }
+}
+
 function PhotoContent({ el, doc, index, imgWidth, editable }: { el: PhotoEl; doc: CollageDoc; index: number; imgWidth: number; editable: boolean }) {
   const ratio = FORMATS[doc.format].ratio
-  const paper = PALETTES[doc.palette].paper
-  const ink = PALETTES[doc.palette].ink
+  const { paper, ink, bg, accent } = PALETTES[doc.palette]
+  // empty frames are paper-coloured; on dark palettes the ink is light too, so the darker colour marks them
+  const mark = luminance(ink) < luminance(bg) ? ink : bg
   let treatment = el.plain || el.fixed ? "plain" : doc.treatment
   if (el.shape !== "rect" && (treatment === "polaroid" || treatment === "torn" || treatment === "film")) treatment = "border"
   const radius = shapeRadius(el, ratio) ?? (treatment === "rounded" ? "2cqw" : treatment === "plain" ? "0.2cqw" : "0")
@@ -114,7 +132,7 @@ function PhotoContent({ el, doc, index, imgWidth, editable }: { el: PhotoEl; doc
           img.src = fallbackSrc(el.id)
         }}
         className={s.photo}
-        style={{ filter: photoFilter, borderRadius: radius }}
+        style={{ filter: photoFilter, borderRadius: radius, ...framing(el) }}
       />
       {lookOverlay}
     </span>
@@ -123,15 +141,17 @@ function PhotoContent({ el, doc, index, imgWidth, editable }: { el: PhotoEl; doc
       className={s.placeholder}
       style={{
         borderRadius: radius,
-        background: `color-mix(in oklab, ${ink} 6%, ${paper})`,
-        border: `0.3cqw dashed color-mix(in oklab, ${ink} 30%, transparent)`,
-        color: `color-mix(in oklab, ${ink} 55%, transparent)`,
-        gap: "0.8cqw",
+        background: `color-mix(in oklab, ${mark} 6%, ${paper})`,
+        border: `0.3cqw dashed color-mix(in oklab, ${mark} 35%, transparent)`,
+        color: `color-mix(in oklab, ${mark} 70%, transparent)`,
+        gap: "1cqw",
       }}
     >
-      <ImagePlus style={{ width: "4.5cqw", height: "4.5cqw" }} strokeWidth={1.5} />
-      <span style={{ fontFamily: FONTS.sans.css, fontSize: "1.7cqw", fontWeight: 600 }}>
-        Фото {index + 1}
+      <span className={s.plus} style={{ background: accent, color: luminance(accent) > 0.6 ? mark : "#fff" }}>
+        <Plus style={{ width: "55%", height: "55%" }} strokeWidth={2.4} />
+      </span>
+      <span style={{ fontFamily: FONTS.sans.css, fontSize: "1.8cqw", fontWeight: 600 }}>
+        {editable ? "Добавить фото" : `Фото ${index + 1}`}
       </span>
     </div>
   )
@@ -294,6 +314,7 @@ export const CollageCanvas = memo(function CollageCanvas({
 }: Props) {
   const ratio = FORMATS[doc.format].ratio
   const ink = PALETTES[doc.palette].ink
+  const anchored = editable && framesLocked(doc)
   let photoIndex = -1
 
   return (
@@ -334,6 +355,7 @@ export const CollageCanvas = memo(function CollageCanvas({
             className={`${s.el} ${dropTargetId === el.id ? s.drop : ""} ${locked ? s.locked : ""}`}
             data-el-id={editable && !locked ? el.id : undefined}
             data-editing={editing ? "true" : undefined}
+            data-pan={editable && el.kind === "photo" && el.src && !cropOf(el.src) ? "true" : undefined}
             style={{ ...box, transform: el.rot ? `rotate(${el.rot}deg)` : undefined }}
             onPointerDown={editable && !editing ? (e) => onElementPointerDown?.(e, el) : undefined}
             onDoubleClick={editable && el.kind === "text" ? () => onTextDoubleClick?.(el) : undefined}
@@ -346,7 +368,7 @@ export const CollageCanvas = memo(function CollageCanvas({
             {selected ? (
               <>
                 <span className={s.selected} />
-                {!editing ? (
+                {!editing && !(anchored && el.kind === "photo") ? (
                   <span
                     className={s.handle}
                     style={{ right: -8, bottom: -8, cursor: "nwse-resize" }}

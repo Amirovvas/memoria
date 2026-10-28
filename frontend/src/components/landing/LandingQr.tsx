@@ -10,7 +10,7 @@ export function LandingQr() {
 
   useEffect(() => {
     let live = true
-    qrDataUrl(window.location.origin, 360).then((d) => live && setSrc(d))
+    qrDataUrl(window.location.origin).then((d) => live && setSrc(d))
     return () => {
       live = false
     }

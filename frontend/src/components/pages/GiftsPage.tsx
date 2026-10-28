@@ -28,7 +28,7 @@ function GiftCard({ gift, onShare, onDelete }: { gift: Gift; onShare: () => void
           <GiftIcon size={40} className={s.giftIcon} />
         )}
         <span className={s.occasion}>
-          {occasion?.emoji} {occasion?.label}
+          {occasion ? <occasion.icon size={13} strokeWidth={2} /> : null} {occasion?.label}
         </span>
         <span className={s.qr}>
           <QrCode size={17} />
@@ -38,7 +38,8 @@ function GiftCard({ gift, onShare, onDelete }: { gift: Gift; onShare: () => void
         <div className={s.info}>
           <h3 className={s.name}>{gift.recipient}</h3>
           <p className={s.sub}>
-            {opening?.emoji} {gift.collages.length} колл. · <TimeAgo ts={gift.createdAt} />
+            {opening ? <opening.icon size={13} strokeWidth={2} className={s.subIcon} /> : null}
+            {gift.collages.length} колл. · <TimeAgo ts={gift.createdAt} />
           </p>
         </div>
         <a className={`icon-btn ${s.action}`} href={`/g/${gift.id}`} target="_blank" rel="noreferrer" aria-label="Открыть страницу" title="Открыть страницу">

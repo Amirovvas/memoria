@@ -26,3 +26,39 @@
 .list {
   padding-top: 1.5rem;
 }
+
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.trashAll {
+  color: var(--accent);
+}
+.dialog {
+  max-width: 28rem;
+}
+.dialogBody {
+  padding: 1.5rem;
+}
+@media (min-width: 40rem) {
+  .dialogBody {
+    padding: 2rem;
+  }
+}
+.dialogTitle {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+.dialogText {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--muted);
+}
+.dialogActions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}

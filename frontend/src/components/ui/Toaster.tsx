@@ -1,11 +1,11 @@
 "use client"
 
 import { Check, CircleAlert, X } from "lucide-react"
-import { useApp } from "../providers/AppProvider"
+import { useToasts } from "../providers/AppProvider"
 import s from "./Toaster.module.css"
 
 export function Toaster() {
-  const { toasts, dismissToast } = useApp()
+  const { toasts, dismissToast } = useToasts()
   return (
     <div aria-live="polite" className={s.stack}>
       {toasts.map((t) => (

@@ -1,5 +1,3 @@
-import { toCanvas } from "html-to-image"
-
 export type ExportFormat = "png" | "jpg" | "pdf"
 
 export interface SizePreset {
@@ -44,7 +42,8 @@ export function presetFit(preset: SizePreset, ratio: number) {
  */
 export async function renderCollage(node: HTMLElement, width: number, height: number, background: string) {
   // collage faces are not preloaded (app/layout.tsx); let the ones this collage uses finish first
-  await document.fonts.ready
+  // html-to-image is loaded on the first export, so it stays out of the editor and gift bundles
+  const [{ toCanvas }] = await Promise.all([import("html-to-image"), document.fonts.ready])
   const rect = node.getBoundingClientRect()
   const scale = Math.min(width / rect.width, height / rect.height)
   const shot = await toCanvas(node, {

@@ -135,6 +135,11 @@ export interface PhotoEl extends BaseEl {
   fixed?: boolean
   /** black and white, whatever the collage tone */
   mono?: boolean
+  /** which part of the photo shows in the frame: 0–100 along each axis, 50 is the centre */
+  fx?: number
+  fy?: number
+  /** how far the photo is zoomed in past filling the frame, 1 = just fills it */
+  zoom?: number
 }
 
 export interface TextEl extends BaseEl {
@@ -182,6 +187,8 @@ export interface CollageDoc {
   look?: LookKey
   treatment: Treatment
   elements: CollageEl[]
+  /** photos uploaded for this collage, shown in its photo panel; other collages have their own */
+  photos?: string[]
 }
 
 export interface TemplateTexts {

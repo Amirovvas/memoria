@@ -24,6 +24,10 @@
 .collage[data-edit="true"] .el:active {
   cursor: grabbing;
 }
+/* dragging a filled frame moves the photo inside it */
+.collage[data-edit="true"] .el[data-pan="true"] {
+  cursor: move;
+}
 .collage[data-edit="true"] .el[data-editing="true"] {
   cursor: text;
 }
@@ -104,6 +108,15 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+.plus {
+  display: grid;
+  place-items: center;
+  width: 7cqw;
+  height: 7cqw;
+  border-radius: 999px;
+  color: #fff;
+  box-shadow: 0 0.4cqw 1.2cqw rgb(30 20 10 / 0.22);
 }
 .caption {
   position: absolute;

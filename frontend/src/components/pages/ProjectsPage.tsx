@@ -1,6 +1,6 @@
 "use client"
 
-import { FolderOpen, LayoutTemplate, Search, SearchX } from "lucide-react"
+import { FolderOpen, LayoutTemplate, Search, SearchX, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useMemo, useState } from "react"
 import { CATEGORY_BY_SLUG } from "@/src/lib/catalog"
@@ -8,13 +8,15 @@ import { ProjectCard } from "../projects/ProjectCard"
 import { useApp } from "../providers/AppProvider"
 import { EmptyArt, EmptyState, plural } from "../ui/bits"
 import { SelectChip } from "../ui/Menu"
+import { Modal } from "../ui/Modal"
 import page from "./page.module.css"
 import s from "./ProjectsPage.module.css"
 
 type Sort = "updated" | "created" | "name"
 
 export function ProjectsPage() {
-  const { activeProjects, trashedProjects } = useApp()
+  const { activeProjects, trashedProjects, trashAllProjects, toast } = useApp()
+  const [confirmAll, setConfirmAll] = useState(false)
   const [q, setQ] = useState("")
   const [type, setType] = useState<string | null>(null)
   const [sort, setSort] = useState<Sort>("updated")
@@ -39,10 +41,42 @@ export function ProjectsPage() {
             {activeProjects.length} {plural(activeProjects.length, "коллаж", "коллажа", "коллажей")} · автосохранение включено
           </p>
         </div>
-        <Link href="/templates" className="btn btn-lg btn-secondary">
-          <LayoutTemplate size={18} /> Шаблоны
-        </Link>
+        <div className={s.headerActions}>
+          {activeProjects.length ? (
+            <button className={`btn btn-lg btn-ghost ${s.trashAll}`} onClick={() => setConfirmAll(true)}>
+              <Trash2 size={18} /> Удалить все
+            </button>
+          ) : null}
+          <Link href="/templates" className="btn btn-lg btn-secondary">
+            <LayoutTemplate size={18} /> Шаблоны
+          </Link>
+        </div>
       </header>
+
+      <Modal open={confirmAll} onClose={() => setConfirmAll(false)} label="Удалить все проекты" className={s.dialog}>
+        <div className={s.dialogBody}>
+          <h2 className={`display ${s.dialogTitle}`}>Удалить все проекты?</h2>
+          <p className={s.dialogText}>
+            {activeProjects.length} {plural(activeProjects.length, "коллаж", "коллажа", "коллажей")} попадут в корзину. Оттуда их
+            можно восстановить, пока корзина не очищена.
+          </p>
+          <div className={s.dialogActions}>
+            <button className="btn btn-ghost" onClick={() => setConfirmAll(false)}>
+              Отмена
+            </button>
+            <button
+              className="btn btn-accent"
+              onClick={() => {
+                const n = trashAllProjects()
+                setConfirmAll(false)
+                if (n) toast(`${n} ${plural(n, "проект перемещён", "проекта перемещены", "проектов перемещены")} в корзину`)
+              }}
+            >
+              <Trash2 size={16} /> Удалить все
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       <div className={page.toolbar}>
         <div className={page.toolbarRow}>

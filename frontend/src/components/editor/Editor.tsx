@@ -29,11 +29,11 @@ import {
   type DragEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react"
-import { autoPlace, emptySlotCount } from "@/src/lib/collage/build"
+import { addToTray, anchorFrames, autoPlace, emptySlotCount, framesLocked, trayPhotos, withPhoto } from "@/src/lib/collage/build"
 import { DECOS, FORMATS } from "@/src/lib/collage/styles"
 import type { CollageDoc, CollageEl, PhotoEl, TextEl } from "@/src/lib/collage/types"
 import { TEMPLATE_BY_ID } from "@/src/lib/catalog"
-import { isSamplePhoto } from "@/src/lib/photos"
+import { cropOf, isSamplePhoto } from "@/src/lib/photos"
 import { CollageCanvas } from "../collage/CollageCanvas"
 import { useApp, type Project } from "../providers/AppProvider"
 import { useMedia } from "../ui/bits"
@@ -77,7 +77,7 @@ function isTyping(target: EventTarget | null) {
 }
 
 interface Gesture {
-  mode: "move" | "resize"
+  mode: "move" | "resize" | "pan"
   el: CollageEl
   sx: number
   sy: number
@@ -85,7 +85,20 @@ interface Gesture {
   before: CollageDoc
   moved: boolean
   wasSelected: boolean
+  /** for "pan": how many screen pixels the photo sticks out of its frame on each axis */
+  spare?: { x: number; y: number }
 }
+
+/** Pixels a cover-fitted photo sticks out of its frame, at the frame's current zoom. */
+function photoSpare(img: HTMLImageElement | null, zoom = 1) {
+  if (!img || !img.naturalWidth || !img.naturalHeight) return null
+  const cw = img.offsetWidth
+  const ch = img.offsetHeight
+  const fit = Math.max(cw / img.naturalWidth, ch / img.naturalHeight) * zoom
+  return { x: img.naturalWidth * fit - cw, y: img.naturalHeight * fit - ch }
+}
+
+const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
 
 function SaveStatus({ state, onSave }: { state: "saved" | "saving" | "unsaved"; onSave: () => void }) {
   if (state === "unsaved")
@@ -110,10 +123,12 @@ function PanelBody({ tool }: { tool: Tool }) {
 
 export function Editor({ project, initialTool }: { project: Project; initialTool?: Tool }) {
   const router = useRouter()
-  const { saveProject, renameProject, touchProject, settings, uploads, addFiles, toast } = useApp()
+  const { saveProject, renameProject, touchProject, settings, addFiles, toast } = useApp()
   // Projects started before looks existed pick theirs up from the template they came from.
   const { doc, commit, live, settle, undo, redo, canUndo, canRedo } = useHistory(
-    project.doc.look || !project.templateId ? project.doc : { ...project.doc, look: TEMPLATE_BY_ID[project.templateId]?.look },
+    anchorFrames(
+      project.doc.look || !project.templateId ? project.doc : { ...project.doc, look: TEMPLATE_BY_ID[project.templateId]?.look },
+    ),
   )
   const mobile = useMedia("(max-width: 767px)")
 
@@ -141,6 +156,7 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
   const ratio = FORMATS[doc.format].ratio
   const selected = useMemo(() => doc.elements.find((e) => e.id === selectedId) ?? null, [doc, selectedId])
   const empty = emptySlotCount(doc)
+  const locked = framesLocked(doc)
 
   /* ---------- lifecycle ---------- */
 
@@ -180,6 +196,14 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
     return () => clearTimeout(t)
   }, [doc, settings.autosave, saveNow])
 
+  // A frame of a reference template that left its place (an undo to an old step, a collage open
+  // since before the frames were locked) goes straight back, so the original never shows beside it.
+  useEffect(() => {
+    if (!locked) return
+    const anchored = anchorFrames(doc)
+    if (anchored !== doc) live(() => anchored)
+  }, [doc, locked, live])
+
   /* ---------- editing API ---------- */
 
   const select = useCallback((id: string | null) => {
@@ -203,7 +227,12 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
 
   const removeEl = useCallback(
     (id: string) => {
-      commit((d) => ({ ...d, elements: d.elements.filter((e) => e.id !== id) }))
+      commit((d) => {
+        const el = d.elements.find((e) => e.id === id)
+        // a frame of a reference template only gives its photo back: removing it would bare the original underneath
+        if (el?.kind === "photo" && framesLocked(d)) return el.src ? patchEl(d, id, withPhoto(el, null)) : d
+        return { ...d, elements: d.elements.filter((e) => e.id !== id) }
+      })
       setSelectedId((s) => (s === id ? null : s))
       setEditingId(null)
     },
@@ -221,7 +250,10 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
 
   const placePhoto = useCallback(
     (slotId: string, src: string) => {
-      commit((d) => patchEl(d, slotId, { src }))
+      commit((d) => {
+        const el = d.elements.find((e) => e.id === slotId)
+        return el?.kind === "photo" ? addToTray(patchEl(d, slotId, withPhoto(el, src)), [src]) : d
+      })
       setSelectedId(slotId)
     },
     [commit],
@@ -229,12 +261,12 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
 
   const autoFill = useCallback(
     (srcs?: string[]) => {
-      const list = srcs ?? uploads.map((u) => u.src)
+      const list = srcs ?? trayPhotos(doc)
       if (!list.length) return
-      commit((d) => clearSamples(autoPlace(d, list)))
+      commit((d) => clearSamples(autoPlace(addToTray(d, list), list)))
       toast("Фото размещены в композиции", "success")
     },
-    [commit, uploads, toast],
+    [commit, doc, toast],
   )
 
   const openFilePicker = useCallback((slotId?: string) => {
@@ -248,10 +280,14 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
       if (!added.length) return
       const srcs = added.map((a) => a.src)
       if (slotId) {
-        commit((d) => autoPlace(patchEl(d, slotId, { src: srcs[0] }), srcs.slice(1)))
+        commit((d) => {
+          const el = d.elements.find((e) => e.id === slotId)
+          const placed = el?.kind === "photo" ? patchEl(d, slotId, withPhoto(el, srcs[0])) : d
+          return autoPlace(addToTray(placed, srcs), srcs.slice(1))
+        })
         setSelectedId(slotId)
       } else {
-        commit((d) => clearSamples(autoPlace(d, srcs)))
+        commit((d) => clearSamples(autoPlace(addToTray(d, srcs), srcs)))
       }
     },
     [addFiles, commit],
@@ -264,6 +300,7 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
 
   const api: EditorApi = {
     doc,
+    projectId: project.id,
     category: project.category,
     projectName: name,
     selected,
@@ -304,7 +341,8 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
         const dy = e.key === "ArrowUp" ? -step : e.key === "ArrowDown" ? step : 0
         commit((d) => {
           const el = d.elements.find((x) => x.id === selectedId)
-          return el ? patchEl(d, selectedId, { x: el.x + dx, y: el.y + dy }) : d
+          if (!el || (el.kind === "photo" && framesLocked(d))) return d
+          return patchEl(d, selectedId, { x: el.x + dx, y: el.y + dy })
         })
       }
     }
@@ -316,6 +354,15 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
 
   const startGesture = (e: ReactPointerEvent, el: CollageEl, mode: Gesture["mode"]) => {
     if (e.button !== 0 || !canvasRef.current) return
+    // A filled frame moves its photo, so any part of a big picture can be chosen; Alt moves the frame itself.
+    let spare: Gesture["spare"]
+    if (mode === "move" && el.kind === "photo" && el.src && !cropOf(el.src) && !(e.altKey && !locked)) {
+      const found = photoSpare((e.currentTarget as HTMLElement).querySelector("img"), el.zoom)
+      if (found) {
+        mode = "pan"
+        spare = found
+      }
+    }
     gesture.current = {
       mode,
       el,
@@ -325,11 +372,22 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
       before: doc,
       moved: false,
       wasSelected: selectedId === el.id,
+      spare,
     }
 
+    // A pointer can report 120+ moves a second; the collage is redrawn at most once per frame.
+    let frame = 0
+    let pending: PointerEvent | null = null
     const move = (ev: PointerEvent) => {
+      pending = ev
+      if (!frame) frame = requestAnimationFrame(flush)
+    }
+    const flush = () => {
+      frame = 0
+      const ev = pending
+      pending = null
       const g = gesture.current
-      if (!g) return
+      if (!g || !ev) return
       const px = ev.clientX - g.sx
       const py = ev.clientY - g.sy
       if (!g.moved && Math.hypot(px, py) < 4) return
@@ -338,7 +396,15 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
       const dy = (py / g.rect.height) * 100
       const src = g.el
 
-      if (g.mode === "move") {
+      if (g.mode === "pan" && src.kind === "photo" && g.spare) {
+        // dragging right uncovers more of the left side, as when sliding a print under a mount
+        const { x: sx, y: sy } = g.spare
+        const fx = sx > 0.5 ? clamp((src.fx ?? 50) - (px / sx) * 100, 0, 100) : src.fx
+        const fy = sy > 0.5 ? clamp((src.fy ?? 50) - (py / sy) * 100, 0, 100) : src.fy
+        live((d) => patchEl(d, src.id, { fx, fy }))
+      } else if (src.kind === "photo" && locked) {
+        // frames of a reference template stay where the original has them
+      } else if (g.mode === "move") {
         let x = src.x + dx
         let y = src.y + dy
         const hp = heightPct(src, ratio)
@@ -367,6 +433,10 @@ export function Editor({ project, initialTool }: { project: Project; initialTool
     }
 
     const up = () => {
+      if (frame) {
+        cancelAnimationFrame(frame)
+        flush()
+      }
       window.removeEventListener("pointermove", move)
       window.removeEventListener("pointerup", up)
       window.removeEventListener("pointercancel", up)

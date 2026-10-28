@@ -52,6 +52,11 @@
   width: 100%;
   transition: scale 0.5s var(--ease);
 }
+/* the fade-up animation makes every card its own layer; the one with an open menu goes above its neighbours */
+.card:has([aria-expanded="true"]) {
+  position: relative;
+  z-index: 20;
+}
 .card:hover .collage {
   scale: 1.02;
 }

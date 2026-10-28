@@ -64,6 +64,7 @@ export function useHistory(initial: CollageDoc) {
 
 export interface EditorApi {
   doc: CollageDoc
+  projectId: string
   category: string
   projectName: string
   selected: CollageEl | null

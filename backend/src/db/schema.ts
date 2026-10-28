@@ -76,6 +76,10 @@ CREATE TABLE IF NOT EXISTS gifts (
 
 CREATE INDEX IF NOT EXISTS gifts_user_id_idx ON gifts (user_id, created_at DESC);
 
+-- a mini game the friend plays before the surprise opens; older gifts open straight away
+ALTER TABLE gifts ADD COLUMN IF NOT EXISTS game text NOT NULL DEFAULT 'none'
+  CHECK (game IN ('none', 'scratch', 'puzzle', 'tictactoe'));
+
 -- Supabase exposes the public schema through its Data API: with RLS on and no policies,
 -- anon/authenticated keys see nothing, while the table owner this API connects as is unaffected.
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;

@@ -65,6 +65,8 @@ interface AppState extends Prefs {
   renameProject: (id: string, name: string) => void
   duplicateProject: (id: string) => void
   trashProject: (id: string) => void
+  /** moves every collage still in the library to the trash; returns how many went */
+  trashAllProjects: () => number
   restoreProject: (id: string) => void
   deleteProject: (id: string) => void
   emptyTrash: () => void
@@ -74,8 +76,11 @@ interface AppState extends Prefs {
   addDemoPhotos: (count?: number) => Promise<Upload[]>
   removeUpload: (id: string) => void
   updateSettings: (patch: Partial<Settings>) => void
-  toasts: Toast[]
   toast: (message: string, tone?: Toast["tone"]) => void
+}
+
+interface ToastState {
+  toasts: Toast[]
   dismissToast: (id: string) => void
 }
 
@@ -90,6 +95,8 @@ const DEFAULT_PREFS: Prefs = { sidebarCollapsed: false, settings: DEFAULT_SETTIN
 const toUpload = (p: ServerPhoto): Upload => ({ id: p.id, src: p.url, name: p.name })
 
 const Ctx = createContext<AppState | null>(null)
+// Toasts come and go every few seconds; kept apart so they redraw only the Toaster, not every screen.
+const ToastCtx = createContext<ToastState | null>(null)
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const qc = useQueryClient()
@@ -147,11 +154,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [prefs, prefsLoaded])
 
-  const toast = useCallback((message: string, tone: Toast["tone"] = "default") => {
-    const id = uid()
-    setToasts((t) => [...t.slice(-2), { id, message, tone }])
-    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3200)
-  }, [])
+  const dismissToast = useCallback((id: string) => setToasts((t) => t.filter((x) => x.id !== id)), [])
+  const toast = useCallback(
+    (message: string, tone: Toast["tone"] = "default") => {
+      const id = uid()
+      setToasts((t) => [...t.slice(-2), { id, message, tone }])
+      setTimeout(() => dismissToast(id), 3200)
+    },
+    [dismissToast],
+  )
+  const toastState = useMemo(() => ({ toasts, dismissToast }), [toasts, dismissToast])
 
   const setTheme = useCallback((t: Theme) => {
     setThemeState(t)
@@ -276,6 +288,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
         patchProject(id, (p) => ({ ...p, deletedAt: now }), { deletedAt: now })
         toast("Проект перемещён в корзину")
       },
+      trashAllProjects: () => {
+        const now = Date.now()
+        for (const p of activeProjects) patchProject(p.id, (cur) => ({ ...cur, deletedAt: now }), { deletedAt: now })
+        return activeProjects.length
+      },
       restoreProject: (id) => {
         patchProject(id, (p) => ({ ...p, deletedAt: undefined }), { deletedAt: null })
         toast("Проект восстановлен", "success")
@@ -324,18 +341,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
         send(keys.photos, () => libraryApi.deletePhoto(id))
       },
       updateSettings: (p) => setPrefs((s) => ({ ...s, settings: { ...s.settings, ...p } })),
-      toasts,
       toast,
-      dismissToast: (id) => setToasts((t) => t.filter((x) => x.id !== id)),
     }
-  }, [prefs, userId, projectsQ.data, projectsQ.isSuccess, favoritesQ.data, favoritesQ.isSuccess, photosQ.data, theme, setTheme, qc, keys, send, setProjects, patchProject, upload, toast, toasts])
+  }, [prefs, userId, projectsQ.data, projectsQ.isSuccess, favoritesQ.data, favoritesQ.isSuccess, photosQ.data, theme, setTheme, qc, keys, send, setProjects, patchProject, upload, toast])
 
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>
+  return (
+    <Ctx.Provider value={value}>
+      <ToastCtx.Provider value={toastState}>{children}</ToastCtx.Provider>
+    </Ctx.Provider>
+  )
 }
 
 export function useApp() {
   const ctx = useContext(Ctx)
   if (!ctx) throw new Error("useApp must be used inside <AppProvider>")
+  return ctx
+}
+
+export function useToasts() {
+  const ctx = useContext(ToastCtx)
+  if (!ctx) throw new Error("useToasts must be used inside <AppProvider>")
   return ctx
 }
 

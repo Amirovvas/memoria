@@ -578,3 +578,32 @@
 .previewEnvelope {
   margin-bottom: 0.75rem;
 }
+
+/* ---------- On the dark "cinema" surprise page: captions turn light; the wizard previews keep theirs ---------- */
+.night .prompt,
+.night .swipeText {
+  color: #f4efe7;
+}
+.night .swipeLeft {
+  color: #a89c8c;
+}
+.night .hooray {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  color: #e8c886;
+  text-shadow: 0 0 24px rgb(255 214 150 / 0.45);
+}
+.night .wish {
+  color: #f4efe7;
+}
+
+.heartIcon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.12em;
+}
+.sealIcon {
+  width: 46%;
+  height: 46%;
+}

@@ -2,7 +2,7 @@
 
 import { Heart, PenLine, Sparkles } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useCallback } from "react"
+import { memo, useCallback } from "react"
 import { CATEGORY_BY_SLUG, templateDoc, type Template } from "@/src/lib/catalog"
 import { STYLES } from "@/src/lib/collage/styles"
 import { CollageCanvas } from "../collage/CollageCanvas"
@@ -50,7 +50,8 @@ export function FavoriteButton({
   )
 }
 
-export function TemplateCard({
+// a grid re-places its cards on every resize and filter; cards whose template did not change stay as they are
+export const TemplateCard = memo(function TemplateCard({
   template: t,
   showCategory,
   imgWidth = 480,
@@ -111,4 +112,4 @@ export function TemplateCard({
       </div>
     </article>
   )
-}
+})

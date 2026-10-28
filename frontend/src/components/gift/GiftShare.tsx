@@ -43,7 +43,7 @@ export function GiftShare({ id, recipient }: { id: string; recipient: string }) 
           <div className={`skeleton ${s.qrSkeleton}`} />
         )}
       </div>
-      <p className={s.caption}>Сканируй — тут сюрприз 🎁</p>
+      <p className={s.caption}>Сканируй — тут сюрприз</p>
 
       <div className={s.link}>
         <span className={s.url}>{url}</span>

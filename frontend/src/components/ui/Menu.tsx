@@ -1,7 +1,7 @@
 "use client"
 
 import { Check, ChevronDown } from "lucide-react"
-import { useEffect, useRef, useState, type ReactNode } from "react"
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react"
 import { cx } from "@/src/lib/cx"
 import s from "./Menu.module.css"
 
@@ -42,13 +42,26 @@ export function Popover({
     }
   }, [open, onOpenChange])
 
+  // A menu opening near the edge of the window flips to the other side instead of running off screen.
+  const panelRef = useRef<HTMLDivElement>(null)
+  const [flipped, setFlipped] = useState(false)
+  useLayoutEffect(() => {
+    if (!open || !ref.current || !panelRef.current) return setFlipped(false)
+    const anchor = ref.current.getBoundingClientRect()
+    const need = panelRef.current.offsetHeight + 12
+    const below = window.innerHeight - anchor.bottom
+    const above = anchor.top
+    setFlipped(side === "bottom" ? below < need && above > below : above < need && below > above)
+  }, [open, side])
+
   const close = () => setOpen(false)
   const pos = align === "right" ? s.alignRight : align === "center" ? s.alignCenter : s.alignLeft
+  const top = (side === "top") !== flipped
   return (
     <div ref={ref} className={s.root}>
       {trigger({ open, toggle: () => setOpen(!open) })}
       {open ? (
-        <div className={cx("animate-pop-in", s.panel, pos, side === "top" ? s.sideTop : s.sideBottom, className)}>
+        <div ref={panelRef} className={cx("animate-pop-in", s.panel, pos, top ? s.sideTop : s.sideBottom, className)}>
           {typeof children === "function" ? children(close) : children}
         </div>
       ) : null}

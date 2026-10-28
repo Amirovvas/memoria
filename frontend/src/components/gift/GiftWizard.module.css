@@ -366,37 +366,18 @@
   line-height: 1rem;
   color: var(--muted);
 }
-.moods {
-  margin-top: 1rem;
-  display: flex;
-  gap: 0.375rem;
-  overflow-x: auto;
-  padding-bottom: 0.25rem;
-}
-.mood {
-  flex-shrink: 0;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  padding: 0.375rem 0.875rem;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--muted);
-  transition: all 0.15s var(--ease);
-}
-.mood:hover {
-  border-color: var(--line-strong);
-  color: var(--ink);
-}
-.mood[aria-selected="true"] {
-  border-color: var(--ink);
-  background: var(--ink);
-  color: var(--bg);
-}
 .tracks {
-  margin-top: 0.75rem;
+  margin-top: 1rem;
 }
-.tracks > :not(:last-child) {
+.tracks > :not(:last-child),
+.trackList > :not(:last-child) {
   margin-bottom: 0.5rem;
+}
+/* the whole library is one list; it scrolls so "own music" and "no music" stay in reach */
+.trackList {
+  max-height: 26rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
 }
 .row {
   display: flex;
@@ -442,12 +423,6 @@
 }
 .trackHint {
   display: block;
-  font-size: 0.75rem;
-  line-height: 1rem;
-  color: var(--muted);
-}
-.pickedNote {
-  padding: 0.25rem 0.25rem 0;
   font-size: 0.75rem;
   line-height: 1rem;
   color: var(--muted);
@@ -635,4 +610,46 @@
   .connector {
     width: 2rem;
   }
+}
+
+.games {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.game {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  padding: 0.5rem 0.625rem 0.5rem 0.5rem;
+  text-align: left;
+  transition: all 0.15s var(--ease);
+}
+.game:hover {
+  border-color: var(--line-strong);
+}
+.game[aria-pressed="true"] {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+  background: var(--surface-2);
+}
+.gameEmoji {
+  display: grid;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: 0.875rem;
+  background: linear-gradient(160deg, #fbefe6, #f3dccf);
+  color: #b4553a;
+}
+.gameHint {
+  margin-top: 0.125rem;
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--muted);
 }

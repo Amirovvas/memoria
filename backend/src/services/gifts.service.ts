@@ -4,10 +4,17 @@ import { apiErrors } from "../utils/apiErrors";
 import { publicUrl, removeObjects, uploadObject } from "./storage.service";
 
 /**
- * The free music library; the files are in the "assets" bucket as music/<id>.mp3 (see scripts/upload-assets.ts).
- * Keep in step with TRACKS in frontend/src/lib/gifts.ts.
+ * The music library; the files are in the "assets" bucket as music/<id>.<ext>, mp3 unless given
+ * (see scripts/upload-assets.ts). Keep in step with TRACKS in frontend/src/lib/gifts.ts.
  */
-const LIBRARY: [id: string, title: string, artist: string][] = [
+const LIBRARY: [id: string, title: string, artist: string, ext?: string][] = [
+  ["nechaev-18", "18", "Nechaev"],
+  ["ordinary", "Ordinary", "Alex Warren"],
+  ["perfect", "Perfect", "Ed Sheeran", "m4a"],
+  ["see-you-again", "See You Again", "Wiz Khalifa"],
+  ["forever-young", "Forever Young", "Alphaville"],
+  ["a-thousand-years", "A Thousand Years", "Christina Perri"],
+  ["those-eyes", "Those Eyes", "New West"],
   ["romantic", "Romantic", "Francisco Alvear"],
   ["true-love", "True Love", "Ahjay Stelino"],
   ["wedding-harp", "Wedding Harp", "Francisco Alvear"],
@@ -44,11 +51,12 @@ const LIBRARY: [id: string, title: string, artist: string][] = [
 ];
 
 const TRACKS: Record<string, { title: string; path: string }> = Object.fromEntries(
-  LIBRARY.map(([id, title, artist]) => [id, { title: `${title} — ${artist}`, path: `music/${id}.mp3` }]),
+  LIBRARY.map(([id, title, artist, ext = "mp3"]) => [id, { title: `${title} — ${artist}`, path: `music/${id}.${ext}` }]),
 );
 
 const OCCASIONS = ["birthday", "anniversary", "wedding", "love", "thanks", "other"];
 const ANIMATIONS = ["envelope", "box", "cake"];
+const GAMES = ["none", "scratch", "puzzle", "tictactoe"];
 
 /** What a friend's phone receives: no owner, only what the page shows. */
 export interface PublicGift {
@@ -59,6 +67,7 @@ export interface PublicGift {
   signature: string;
   finale: string;
   animation: string;
+  game: string;
   music: { url: string; title: string } | null;
   collages: { url: string; w: number; h: number }[];
   createdAt: number;
@@ -79,12 +88,13 @@ interface GiftRow {
   signature: string;
   finale: string;
   animation: string;
+  game: string;
   music: StoredMusic | null;
   collages: { path: string; w: number; h: number }[];
   created_at: Date;
 }
 
-const COLUMNS = "id, recipient, occasion, message, signature, finale, animation, music, collages, created_at";
+const COLUMNS = "id, recipient, occasion, message, signature, finale, animation, game, music, collages, created_at";
 
 const musicOf = (m: StoredMusic | null) => {
   if (!m) return null;
@@ -105,6 +115,7 @@ const toGift = (r: GiftRow): Gift => {
     signature: r.signature,
     finale: r.finale,
     animation: r.animation,
+    game: r.game,
     music: musicOf(r.music),
     collages,
     cover: collages[0]?.url ?? null,
@@ -199,8 +210,10 @@ const newId = () => {
 export const createGift = async (userId: string, body: Record<string, unknown>) => {
   const occasion = String(body.occasion ?? "");
   const animation = String(body.animation ?? "");
+  const game = String(body.game ?? "none");
   if (!OCCASIONS.includes(occasion)) throw apiErrors.badRequest("Выберите повод");
   if (!ANIMATIONS.includes(animation)) throw apiErrors.badRequest("Выберите анимацию");
+  if (!GAMES.includes(game)) throw apiErrors.badRequest("Такой игры нет");
   const values = [
     newId(),
     userId,
@@ -212,10 +225,11 @@ export const createGift = async (userId: string, body: Record<string, unknown>) 
     animation,
     JSON.stringify(checkMusic(userId, body.music)),
     JSON.stringify(checkCollages(userId, body.collages)),
+    game,
   ];
   const { rows } = await pool.query<GiftRow>(
-    `INSERT INTO gifts (id, user_id, recipient, occasion, message, signature, finale, animation, music, collages)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING ${COLUMNS}`,
+    `INSERT INTO gifts (id, user_id, recipient, occasion, message, signature, finale, animation, music, collages, game)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING ${COLUMNS}`,
     values,
   );
   return toGift(rows[0]!);
@@ -244,5 +258,7 @@ export const deleteGift = async (userId: string, id: string) => {
     [id, userId],
   );
   if (!rows[0]) throw apiErrors.notFound("Подарок не найден");
-  await removeObjects("gifts", filesOf(rows[0]));
+  // the gift is gone once its row is; the files are swept up afterwards, so nobody waits on Storage
+  const files = filesOf(rows[0]);
+  void removeObjects("gifts", files).catch((err) => console.error(`Gift ${id}: files left in Storage`, files, err));
 };

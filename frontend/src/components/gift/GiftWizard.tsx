@@ -7,16 +7,15 @@ import { useUser } from "@/src/hooks/useUser"
 import { useCreateGift } from "@/src/hooks/useCreateGift"
 import { snapshotCollage } from "@/src/lib/export/snapshot"
 import {
-  MUSIC_MOODS,
+  GAMES,
   OCCASION_BY_ID,
   OCCASION_TRACK,
   OCCASIONS,
   OPENINGS,
-  TRACK_BY_ID,
   TRACKS,
   suggestWishes,
+  type Game,
   type Gift,
-  type MusicMood,
   type Occasion,
   type Opening,
 } from "@/src/lib/gifts"
@@ -201,7 +200,7 @@ function WordsStep({ words, setWords }: { words: Words; setWords: (patch: Partia
                 if (ideas) setIdeas(suggestWishes(o.id, words.recipient, seed))
               }}
             >
-              <span>{o.emoji}</span> {o.label}
+              <o.icon size={15} strokeWidth={1.9} /> {o.label}
             </button>
           ))}
         </div>
@@ -267,12 +266,16 @@ function SurpriseStep({
   occasion,
   opening,
   setOpening,
+  game,
+  setGame,
   music,
   setMusic,
 }: {
   occasion: Occasion
   opening: Opening
   setOpening: (o: Opening) => void
+  game: Game
+  setGame: (g: Game) => void
   music: MusicChoice
   setMusic: (m: MusicChoice) => void
 }) {
@@ -280,8 +283,6 @@ function SurpriseStep({
   const audio = useRef<HTMLAudioElement | null>(null)
   const [playing, setPlaying] = useState<string | null>(null)
   const own = music && "file" in music ? music.file : null
-  const picked = music && "track" in music ? TRACK_BY_ID[music.track] : null
-  const [mood, setMood] = useState<MusicMood>(() => (picked ?? TRACK_BY_ID[OCCASION_TRACK[occasion]]).mood)
   const suggested = OCCASION_TRACK[occasion]
   const ownSrc = useMemo(() => (own ? URL.createObjectURL(own) : null), [own])
 
@@ -344,48 +345,49 @@ function SurpriseStep({
       </div>
 
       <div>
-        <h3 className={`display ${s.title}`}>Музыка</h3>
-        <p className={s.sub}>Включится, когда друг нажмёт «Открыть», и будет играть по кругу.</p>
-        <div className={`scrollbar-thin ${s.moods}`} role="tablist" aria-label="Настроение">
-          {MUSIC_MOODS.map((m) => (
-            <button
-              key={m.id}
-              role="tab"
-              aria-selected={mood === m.id}
-              onClick={() => setMood(m.id)}
-              className={s.mood}
-            >
-              {m.label}
+        <h3 className={`display ${s.title}`}>Игра перед сюрпризом</h3>
+        <p className={s.sub}>Друг сначала сыграет — и только потом увидит коллаж и поздравление.</p>
+        <div className={s.games}>
+          {GAMES.map((g) => (
+            <button key={g.id} onClick={() => setGame(g.id)} aria-pressed={game === g.id} className={s.game}>
+              <span className={s.gameEmoji} aria-hidden>
+                <g.icon size={20} strokeWidth={1.8} />
+              </span>
+              <span className={s.openingText}>
+                <span className={s.openingLabel}>{g.label}</span>
+                <span className={s.gameHint}>{g.text}</span>
+              </span>
             </button>
           ))}
         </div>
-        <div className={s.tracks}>
-          {TRACKS.filter((t) => t.mood === mood).map((t) => {
-            const active = !!music && "track" in music && music.track === t.id
-            return (
-              <div key={t.id} className={row(active)}>
-                <button className={`icon-btn ${s.play}`} onClick={() => listen(t.id, t.url)} aria-label={playing === t.id ? "Пауза" : "Послушать"}>
-                  {playing === t.id ? <Pause size={16} /> : <Play size={16} />}
-                </button>
-                <button className={s.trackInfo} onClick={() => setMusic({ track: t.id })}>
-                  <span className={cx(s.truncate, s.trackTitle)}>
-                    {t.title} <span className={s.artist}>— {t.artist}</span>
-                  </span>
-                  <span className={s.trackHint}>
-                    {t.hint}
-                    {t.id === suggested ? <span className={s.accent}> · подходит к поводу</span> : null}
-                  </span>
-                </button>
-                <Radio on={active} onClick={() => setMusic({ track: t.id })} />
-              </div>
-            )
-          })}
+      </div>
 
-          {picked && picked.mood !== mood ? (
-            <p className={s.pickedNote}>
-              Выбран трек «{picked.title}» из раздела «{MUSIC_MOODS.find((m) => m.id === picked.mood)?.label}»
-            </p>
-          ) : null}
+      <div>
+        <h3 className={`display ${s.title}`}>Музыка</h3>
+        <p className={s.sub}>Включится, когда друг нажмёт «Открыть», и будет играть по кругу.</p>
+        <div className={s.tracks}>
+          <div className={`scrollbar-thin ${s.trackList}`}>
+            {TRACKS.map((t) => {
+              const active = !!music && "track" in music && music.track === t.id
+              return (
+                <div key={t.id} className={row(active)}>
+                  <button className={`icon-btn ${s.play}`} onClick={() => listen(t.id, t.url)} aria-label={playing === t.id ? "Пауза" : "Послушать"}>
+                    {playing === t.id ? <Pause size={16} /> : <Play size={16} />}
+                  </button>
+                  <button className={s.trackInfo} onClick={() => setMusic({ track: t.id })}>
+                    <span className={cx(s.truncate, s.trackTitle)}>
+                      {t.title} <span className={s.artist}>— {t.artist}</span>
+                    </span>
+                    <span className={s.trackHint}>
+                      {t.hint}
+                      {t.id === suggested ? <span className={s.accent}> · подходит к поводу</span> : null}
+                    </span>
+                  </button>
+                  <Radio on={active} onClick={() => setMusic({ track: t.id })} />
+                </div>
+              )
+            })}
+          </div>
 
           <div className={row(!!own)}>
             {ownSrc ? (
@@ -500,6 +502,7 @@ export function GiftWizard({ open, onClose, projectId }: { open: boolean; onClos
     finale: OCCASION_BY_ID.birthday.finale,
   })
   const [opening, setOpening] = useState<Opening>("cake")
+  const [game, setGame] = useState<Game>("scratch")
   const [music, setMusicState] = useState<MusicChoice>({ track: OCCASION_TRACK.birthday })
   // the track follows the occasion until the person picks music themselves
   const musicPicked = useRef(false)
@@ -560,6 +563,7 @@ export function GiftWizard({ open, onClose, projectId }: { open: boolean; onClos
         signature: words.signature.trim(),
         finale: words.finale.trim(),
         animation: opening,
+        game,
         music,
         snapshots,
       })
@@ -591,7 +595,7 @@ export function GiftWizard({ open, onClose, projectId }: { open: boolean; onClos
       <div ref={bodyRef} className={`scrollbar-thin ${s.body}`}>
         {step === 0 ? <CollagesStep projects={activeProjects} selected={selected} setSelected={setSelected} /> : null}
         {step === 1 ? <WordsStep words={words} setWords={setWords} /> : null}
-        {step === 2 ? <SurpriseStep occasion={words.occasion} opening={opening} setOpening={setOpening} music={music} setMusic={setMusic} /> : null}
+        {step === 2 ? <SurpriseStep occasion={words.occasion} opening={opening} setOpening={setOpening} game={game} setGame={setGame} music={music} setMusic={setMusic} /> : null}
         {step === 3 && gift ? <DoneStep gift={gift} /> : null}
       </div>
 
